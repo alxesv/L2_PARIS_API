@@ -15,4 +15,4 @@ def read_json():
     """
     with open("rdu-weather-history.json", "r") as f:
         data = json.load(f)
-    return data
+    return "Request Status 200",data

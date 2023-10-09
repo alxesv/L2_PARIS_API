@@ -14,8 +14,10 @@ def read_root():
 def read_item(item_id: int, q: Union[str, None] = None):
     """
     Exemple de docstring pour la fonction read_item
-    :param item_id: id de l'item
-    :param q: paramètre optionnel
-    :return: dict
+    ### Paramètres
+    - item_id: id de l'item
+    - q: paramètre optionnel
+    ### Retour
+    - json avec les paramètres
     """
     return {"item_id": item_id, "q": q}

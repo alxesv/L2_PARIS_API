@@ -2,14 +2,16 @@ import json
 
 from fastapi import FastAPI
 
+from router.weather import router
+
 app = FastAPI()
 
-@app.get('')
+
+@router.get('')
 def read_json():
     """
-    ### Retour
-    - return un ensemble de données de la date
-    mise en paramètre de l'url a la place de {date}
+    ### Return with this method
+    - returns a set of weather data without parameters in the url
     """
     with open("rdu-weather-history.json", "r") as f:
         data = json.load(f)

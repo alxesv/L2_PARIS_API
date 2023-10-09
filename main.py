@@ -2,8 +2,10 @@ from typing import Union
 
 from fastapi import FastAPI
 
-app = FastAPI()
+from router import weather
 
+app = FastAPI()
+app.include_router(weather.router)
 
 @app.get("/")
 def read_root():

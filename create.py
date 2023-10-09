@@ -2,6 +2,7 @@ from router.weather import router
 from pydantic import BaseModel
 import datetime
 import json
+from fastapi import HTTPException
 class Weather(BaseModel):
     date: str
     tmin: int
@@ -25,13 +26,13 @@ def create_weather(weather: Weather):
     try:
         datetime.date.fromisoformat(weather.date)
     except ValueError:
-        return {"status": 422, "message": "Date invalide"}
+        return HTTPException(status_code=422, detail="Date invalide")
 
     if weather.date in [w["date"] for w in json.load(open("rdu-weather-history.json", "r"))]:
-        return {"status": 400, "message": "Date déjà présente dans la base"}
+        return HTTPException(status_code=409, detail="Date déjà présente")
 
     if weather.tmin > weather.tmax:
-        return {"status": 400, "message": "Tmin doit être inférieur à Tmax"}
+        return HTTPException(status_code=400, detail="Tmin doit être inférieur à Tmax")
 
     with open("rdu-weather-history.json", "r") as f:
         data = json.load(f)
@@ -39,4 +40,4 @@ def create_weather(weather: Weather):
     with open("rdu-weather-history.json", "w") as f:
         json.dump(data, f)
 
-    return {"status": 200, "message": "Weather ajouté", "weather": weather.model_dump()}
+    return {"status": 201, "message": "Weather ajouté", "weather": weather.model_dump()}

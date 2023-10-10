@@ -1,17 +1,14 @@
-import psycopg2
+from models import Base
 from dotenv import load_dotenv
 import os
+
+from sqlalchemy import create_engine
 
 load_dotenv()
 
 db_name = os.getenv("DB_NAME")
 db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
 
-conn = psycopg2.connect(f"dbname={db_name} user={db_user}")
-cur = conn.cursor()
-
-cur.execute("SELECT * FROM test_table;")
-
-records = cur.fetchall()
-
-print(records)
+engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password}@localhost/{db_name}", echo=True)
+Base.metadata.create_all(engine)

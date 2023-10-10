@@ -8,11 +8,19 @@ app = FastAPI()
 
 
 @router.get("/")
-def read_json():
+def read_json(skip: int = 0, limit: int = 10):
     """
-    ### Return with this method
-    - returns a set of weather data without parameters in the url
+    ### Parameters
+    - skip: number of elements to skip
+    - limit: number of elements to return
+    ### Return
+    - a set of weather data, filtered by the parameters
     """
+
     with open("rdu-weather-history.json", "r") as f:
         data = json.load(f)
-    return {"status": 201, "data": data}
+
+    response = {"status": 201, "data": data[skip:skip + limit], "nextPage" : f"http://127.0.0.1:8000/weather?skip={str(skip + limit)}&limit={str(limit)}"}
+    if skip > 0:
+        response["previousPage"] = f"http://127.0.0.1:8000/weather?skip={str(skip - limit)}&limit={str(limit)}"
+    return response

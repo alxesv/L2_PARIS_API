@@ -7,7 +7,7 @@ from router.weather import router
 app = FastAPI()
 
 
-@router.get('')
+@router.get("/")
 def read_json():
     """
     ### Return with this method

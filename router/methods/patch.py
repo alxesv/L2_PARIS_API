@@ -28,7 +28,7 @@ def modify_weather(
     ### Return
     - JSON with the modified weather forecast
     """
-    with open("../../rdu-weather-history.json", "r") as json_file:
+    with open("rdu-weather-history.json", "r") as json_file:
         data = json.load(json_file)
 
     matching_items = [item for item in data if item.get("date") == date]

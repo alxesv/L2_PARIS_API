@@ -5,7 +5,7 @@ from fastapi import status, HTTPException
 from router.weather import router
 
 
-@router.patch('', status_code=status.HTTP_200_OK)
+@router.patch("/", status_code=status.HTTP_200_OK)
 def modify_weather(
     date: str,
     tmin: int | None = None,

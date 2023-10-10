@@ -9,7 +9,7 @@ app = FastAPI()
 
 @router.get("/")
 def read_json(skip: int = 0, limit: int = 10, date: str = None, tmin: int = None, tmax: int = None, prcp: float = None,
-              snow: float = None, snwd: float = None, awnd: float = None):
+              snow: float = None, snwd: float = None, awnd: float = None, sort: str = None):
     """
     ### Parameters
     - skip: number of elements to skip
@@ -67,6 +67,21 @@ def read_json(skip: int = 0, limit: int = 10, date: str = None, tmin: int = None
         if url[-1] != "?":
             url += "&"
         url += f"awnd={awnd}"
+
+    if sort is not None:
+        sort_url = ""
+        sort = sort.split(",")
+        for s in sort:
+            if s[0] == "-":
+                data = sorted(data, key=lambda x: x[s[1:]], reverse=True)
+                sort_url += f"-{s[1:]},"
+            else:
+                data = sorted(data, key=lambda x: x[s])
+                sort_url += f"{s},"
+        if url[-1] != "?":
+            url += "&"
+        url += f"sort={sort_url[:-1]}"
+
 
     if len(data) == 0:
         return {"status": 404, "message": "No data found"}

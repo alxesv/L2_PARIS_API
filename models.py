@@ -20,7 +20,7 @@ class Culture(Base):
     date_fin: Mapped[str]
     qte_recoltee: Mapped[int]
     parcelle: Mapped["Parcelle"] = relationship(back_populates="cultures")
-    productions: Mapped["Production"] = relationship(back_populates="cultures")
+    production: Mapped["Production"] = relationship(back_populates="cultures")
 
 
 class Production(Base):
@@ -93,7 +93,7 @@ class Posseder(Base):
 class ElementChimique(Base):
     __tablename__ = "element_chimique"
     code_element: Mapped[str] = mapped_column(String(5), primary_key=True)
-    un: Mapped[str] = mapped_column(String(20))
+    un: Mapped[str] = mapped_column(ForeignKey("unite.un"))
     libelle_element: Mapped[str] = mapped_column(String(20))
     posseder: Mapped[List["Posseder"]] = relationship(
         back_populates="element_chimique", cascade="all, delete-orphan"
@@ -110,6 +110,6 @@ class Unite(Base):
     engrais: Mapped[List["Engrais"]] = relationship(
         back_populates="unite", cascade="all, delete-orphan"
     )
-    elements_chimiques: Mapped[List["ElementChimique"]] = relationship(
+    element_chimiques: Mapped[List["ElementChimique"]] = relationship(
         back_populates="unite", cascade="all, delete-orphan"
     )

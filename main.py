@@ -2,8 +2,10 @@ from typing import Union
 
 from fastapi import FastAPI
 
-app = FastAPI()
+from router.unite.unite import router as unite_router
 
+app = FastAPI()
+app.include_router(unite_router)
 
 @app.get("/")
 def read_root():

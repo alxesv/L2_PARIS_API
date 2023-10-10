@@ -1,5 +1,6 @@
 from router.weather import router
 import json
+from fastapi import HTTPException
 @router.put("/")
 def put_weather(
     date: str,

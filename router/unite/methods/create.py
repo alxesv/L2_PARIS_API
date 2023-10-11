@@ -16,14 +16,17 @@ def create_unite(unite: UniteBase):
     - Status code 201 si tout s'est bien passé avec message de confirmation
     - Message d'erreur avec le status code correspondant sinon
     """
-    try:
-        unites = session.query(Unite).all()
-        for un in unites:
-            print(un)
-        if unite in unites:
-            raise Exception("Unite déjà existante")
 
-        return {"message": "Unite créée avec succès", "status": 201, "unite": unite}
+    unites = session.query(Unite).all()
+    for un in unites:
+        if un.un == unite.un:
+            return {"message": "Unite déjà existante", "status": 400}
+
+    try:
+        unite = Unite(un=unite.un)
+        session.add(unite)
+        session.commit()
+        return {"message": "Unite créée avec succès", "status": 201, "unite": unite.un}
 
     except Exception as e:
         return {"message": str(e), "status": 400}

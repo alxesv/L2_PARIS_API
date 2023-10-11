@@ -2,13 +2,14 @@ from database import session
 from router.production.production import router
 from models import Production
 from pydantic import BaseModel
+from fastapi import status, HTTPException
 
 
 class ProductionBase(BaseModel):
     code_production: int
     un: str
     nom_production: str
-@router.post("/")
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def create_production(production: ProductionBase):
     """
     Ajoute une ligne dans la table production
@@ -22,13 +23,12 @@ def create_production(production: ProductionBase):
 
     for code_production in productions:
         if code_production.code_production == production.code_production:
-            return {"message": "Production déjà existante", "status": 400}
-
+            raise HTTPException(status_code=400, detail="Production déjà existante")
     try:
         production = Production(code_production=production.code_production, un=production.un, nom_production=production.nom_production)
         session.add(production)
         session.commit()
-        return {"message": "Production créée avec succès", "status": 201, "production": [{"code_production": production.code_production, "un": production.un, "nom_production": production.nom_production}]}
+        return {"message": "Production créée avec succès", "production": [{"code_production": production.code_production, "un": production.un, "nom_production": production.nom_production}]}
 
     except Exception as e:
-        return {"message": str(e), "status": 400}
+        raise HTTPException(status_code=400, detail=str(e))

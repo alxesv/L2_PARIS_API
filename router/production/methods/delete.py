@@ -1,13 +1,14 @@
 from database import session
 from router.production.production import router
 from models import Production
+from fastapi import status, HTTPException
 
-@router.delete("/{production}")
+@router.delete("/{production}", status_code=status.HTTP_200_OK)
 def delete_production(production: int):
     """
     Supprime une ligne dans la table production
     ### Paramètres
-    - production : l'id de la production
+    - production : le code_production de la production
     ### Retour
     - Status code 200 si tout s'est bien passé avec message de confirmation
     - Message d'erreur avec le status code correspondant sinon
@@ -17,6 +18,6 @@ def delete_production(production: int):
         if code_production.code_production == production:
             session.delete(code_production)
             session.commit()
-            return {"message": "Unite supprimée avec succès", "status": 200}
+            return {"message": "Production supprimée avec succès"}
 
-    return {"message": "Unite non trouvée", "status": 404}
+    raise HTTPException(status_code=404, detail="La production n'a pas été trouvée")

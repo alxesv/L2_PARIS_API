@@ -1,6 +1,6 @@
 from database import session
 from router.production.production import router
-from models import Production
+from models import Production, Unite
 from pydantic import BaseModel
 from fastapi import status, HTTPException
 
@@ -24,6 +24,11 @@ def create_production(production: ProductionBase):
     for code_production in productions:
         if code_production.code_production == production.code_production:
             raise HTTPException(status_code=400, detail="Production déjà existante")
+
+        if production.un is not None:
+            all_unites = session.query(Unite).all()
+            if not any(unite.un == production.un for unite in all_unites):
+                raise HTTPException(status_code=404, detail="Unite non trouvée")
     try:
         add_production = Production(code_production=production.code_production, un=production.un, nom_production=production.nom_production)
         session.add(add_production)

@@ -20,21 +20,31 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
 
     url = f"http://127.0.0.1:8000/production?"
 
-    sort_mapping = Production.__table__.columns.keys()
+    data = session.query(Production).all()
 
-    if sort:
-        sort_fields = sort.split(',')
+    sortable = Production.__table__.columns.keys()
+
+    if sort is not None:
         sort_criteria = []
-
-        for field in sort_fields:
-            if field.startswith('-'):
-                sort_criteria.append(desc(sort_mapping[field[1:]]))
+        sort_url = ""
+        sort = sort.split(",")
+        for s in sort:
+            if s[0] == "-":
+                check_sort = s[1:]
             else:
-                sort_criteria.append(asc(sort_mapping[field]))
-
+                check_sort = s
+            if check_sort not in sortable:
+                raise HTTPException(status_code=400, detail=f"Le champ de tri {check_sort} n'existe pas")
+            if s[0] == "-":
+                sort_criteria.append(getattr(Production, s[1:]).desc())
+                sort_url += f"-{s[1:]},"
+            else:
+                sort_criteria.append(getattr(Production, s))
+                sort_url += f"{s},"
+        if url[-1] != "?":
+            url += "&"
+        url += f"sort={sort_url[:-1]}"
         data = session.query(Production).order_by(*sort_criteria).all()
-    else:
-        data = session.query(Production).all()
 
     if un is not None:
         if not any(production.un == un for production in data):

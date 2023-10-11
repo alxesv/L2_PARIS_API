@@ -1,8 +1,9 @@
 from database import session
 from router.unite.unite import router
 from models import Unite
+from fastapi import HTTPException
 
-@router.delete("/{unite}")
+@router.delete("/{unite}", status_code=200)
 def delete_unite(unite: str):
     """
     Supprime une ligne dans la table unite
@@ -17,6 +18,6 @@ def delete_unite(unite: str):
         if un.un == unite:
             session.delete(un)
             session.commit()
-            return {"message": "Unite supprimée avec succès", "status": 200}
+            return {"message": "Unite supprimée avec succès"}
 
-    return {"message": "Unite non trouvée", "status": 404}
+    raise HTTPException(status_code=404, detail="Unite non trouvée")

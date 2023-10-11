@@ -2,7 +2,7 @@ from database import session
 from router.unite.unite import router
 from models import Unite
 from pydantic import BaseModel
-
+from fastapi import HTTPException
 class UniteBase(BaseModel):
     un: str
 
@@ -20,15 +20,15 @@ def update_unite(unite: str, new_unite: UniteBase):
     unites = session.query(Unite).all()
 
     if len(new_unite.un) == 0:
-        return {"message": "Unite vide", "status": 400}
+        raise HTTPException(status_code=400, detail="Unite vide")
 
     if new_unite.un in [un.un for un in unites]:
-        return {"message": "Unite déjà existante", "status": 400}
+        raise HTTPException(status_code=400, detail="Unite déjà existante")
 
     for un in unites:
         if un.un == unite:
             un.un = new_unite.un
             session.commit()
-            return {"message": "Unite modifiée avec succès", "status": 200}
+            return {"message": "Unite modifiée avec succès"}
 
-    return {"message": "Unite non trouvée", "status": 404}
+    raise HTTPException(status_code=404, detail="Unite non trouvée")

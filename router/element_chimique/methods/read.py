@@ -2,10 +2,11 @@ from database import session
 from router.element_chimique.element_chimique import router
 from models import ElementChimique
 from sqlalchemy import asc, desc
+from fastapi import HTTPException, status
 
 
-@router.get("/")
-def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None):
+@router.get("/", status_code=status.HTTP_200_OK)
+def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, libelle_element: str = None):
     """
     Récupère les lignes de la table élément chimique
     ### Paramètres
@@ -19,11 +20,7 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None):
 
     url = f"http://127.0.0.1:8000/element_chimique?"
 
-    sort_mapping = {
-        "code_element": ElementChimique.code_element,
-        "un": ElementChimique.un,
-        "libelle_element": ElementChimique.libelle_element,
-    }
+    sort_mapping = ElementChimique.__table__.columns.keys()
 
     if sort:
         sort_fields = sort.split(',')
@@ -39,11 +36,21 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None):
     else:
         data = session.query(ElementChimique).all()
 
+    if un is not None:
+        if not any(element_chimique.un == un for element_chimique in data):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unite non trouvée")
+        data = [element_chimique for element_chimique in data if element_chimique.un == un]
+
+    if libelle_element is not None:
+        if not any(element_chimique.libelle_element == libelle_element for element_chimique in data):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun libellé trouvée")
+        data = [element_chimique for element_chimique in data if element_chimique.libelle_element == libelle_element]
+
     if len(data) == 0:
-        return {"message": "Aucun élément chimique trouvée", "status": 404}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun élément chimique trouvée")
 
     if skip >= len(data):
-        return {"message": "Skip est plus grand que le nombre d'élément chimique", "status": 400}
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Skip est plus grand que le nombre d'élément chimique ({len(data)})")
 
     if limit > len(data):
         limit = len(data)
@@ -51,7 +58,7 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None):
     if url[-1] != "?":
         url += "&"
 
-    response = {"status": 200, "elements": [element_chimique for element_chimique in data[skip:skip + limit]]}
+    response = { "elements": [element_chimique for element_chimique in data[skip:skip + limit]] }
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -60,7 +67,8 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None):
 
     return response
 
-@router.get("/{code_element}")
+
+@router.get("/{code_element}", status_code=status.HTTP_200_OK)
 def read_element_chimique(code_element: str):
     """
     Récupère une ligne de la table élément chimique
@@ -75,6 +83,6 @@ def read_element_chimique(code_element: str):
     data = session.query(ElementChimique).filter(ElementChimique.code_element == code_element).first()
 
     if not data:
-        return {"message": "Élément introuvable", "status": 404}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Élément introuvable")
 
-    return {"status": 200, "element": data}
+    return { "element_chimique": data }

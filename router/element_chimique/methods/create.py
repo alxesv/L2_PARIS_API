@@ -2,6 +2,7 @@ from database import session
 from router.element_chimique.element_chimique import router
 from models import ElementChimique
 from pydantic import BaseModel
+from fastapi import HTTPException, status
 
 
 class ElementChimiqueBase(BaseModel):
@@ -10,7 +11,7 @@ class ElementChimiqueBase(BaseModel):
     libelle_element: str
 
 
-@router.post("/")
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def create_element_chimique(new_element_chimique: ElementChimiqueBase):
     """
    Ajoute une ligne dans la table unite
@@ -26,14 +27,14 @@ def create_element_chimique(new_element_chimique: ElementChimiqueBase):
     element_chimiques = session.query(ElementChimique).all()
     for elt_chimique in element_chimiques:
         if elt_chimique.code_element == new_element_chimique.code_element:
-            return {"message": "Élément déjà existant", "status": 400}
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Élément déjà existant")
 
     try:
         element_chimique = ElementChimique(code_element=new_element_chimique.code_element,
                                            un=new_element_chimique.un, libelle_element=new_element_chimique.libelle_element)
         session.add(element_chimique)
         session.commit()
-        return {"message": "Élément créé avec succès", "status": 201, "element": new_element_chimique}
+        return {"message": "Élément créé avec succès", "element": new_element_chimique}
 
     except Exception as e:
-        return {"message": str(e), "status": 400}
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

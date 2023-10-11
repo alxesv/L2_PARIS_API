@@ -14,6 +14,7 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
     - un tableau d'objets de type Unite
     - un message d'erreur en cas d'erreur
     - un status code correspondant
+    - url de navigation pour la pagination
     """
 
     url = f"http://127.0.0.1:8000/unite?"

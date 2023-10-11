@@ -28,7 +28,7 @@ def create_production(production: ProductionBase):
         production = Production(code_production=production.code_production, un=production.un, nom_production=production.nom_production)
         session.add(production)
         session.commit()
-        return {"message": "Production créée avec succès", "status": 201, "production": production.code_production}
+        return {"message": "Production créée avec succès", "status": 201, "production": [{"code_production": production.code_production, "un": production.un, "nom_production": production.nom_production}]}
 
     except Exception as e:
         return {"message": str(e), "status": 400}

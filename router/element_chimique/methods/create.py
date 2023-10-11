@@ -1,14 +1,8 @@
 from database import session
 from router.element_chimique.element_chimique import router
 from models import ElementChimique
-from pydantic import BaseModel
 from fastapi import HTTPException, status
-
-
-class ElementChimiqueBase(BaseModel):
-    code_element: str
-    un: str
-    libelle_element: str
+from .base_model import ElementChimiqueBase
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)

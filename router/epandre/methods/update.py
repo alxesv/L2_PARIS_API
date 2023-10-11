@@ -8,7 +8,7 @@ class EpandreBase(BaseModel):
     id_engrais: int
     no_parcelle: int
     date: str
-    qte_epandue: int = None
+    qte_epandue: int
 
 @router.patch('/', status_code=200)
 def modify_epandre(epandre_id: EpandreBase):

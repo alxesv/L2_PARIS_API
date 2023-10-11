@@ -7,11 +7,11 @@ from pydantic import BaseModel
 
 
 class ElementChimiqueBase(BaseModel):
-    un: str
-    libelle_element: str
+    un: str = None
+    libelle_element: str = None
 
 
-@router.put("/{code_element}", status_code=status.HTTP_200_OK)
+@router.patch("/{code_element}", status_code=status.HTTP_200_OK)
 def replace_element_chimique(code_element: str, new_element_chimique: ElementChimiqueBase):
     """
     Remplace une ligne dans la table engrais
@@ -22,7 +22,7 @@ def replace_element_chimique(code_element: str, new_element_chimique: ElementChi
     - un message de confirmation ou d'erreur
     - un status code correspondant
     """
-    if new_element_chimique.un is None or new_element_chimique.libelle_element is None:
+    if new_element_chimique.un is None and new_element_chimique.libelle_element is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Il manque un paramètre")
 
     all_elements = session.query(ElementChimique).all()
@@ -36,10 +36,16 @@ def replace_element_chimique(code_element: str, new_element_chimique: ElementChi
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unite non trouvée")
 
     try:
-        engrais = session.query(ElementChimique).filter(ElementChimique.code_element == code_element).first()
-        for (key, value) in new_element_chimique:
-            setattr(engrais, key, value)
+        element_chimique = session.query(ElementChimique).filter(ElementChimique.code_element == code_element).first()
+        if new_element_chimique.un is not None:
+            element_chimique.un = new_element_chimique.un
+        else:
+            new_element_chimique.un = element_chimique.un
+        if new_element_chimique.libelle_element is not None:
+            element_chimique.libelle_element = new_element_chimique.libelle_element
+        else:
+            new_element_chimique.libelle_element = element_chimique.libelle_element
         session.commit()
-        return {"message": "Élément chimique modifié avec succès", "engrais": new_element_chimique.model_dump()}
+        return {"message": "Élément chimique modifié avec succès", "element": new_element_chimique.model_dump()}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

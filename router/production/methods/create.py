@@ -25,10 +25,10 @@ def create_production(production: ProductionBase):
         if code_production.code_production == production.code_production:
             raise HTTPException(status_code=400, detail="Production déjà existante")
     try:
-        production = Production(code_production=production.code_production, un=production.un, nom_production=production.nom_production)
-        session.add(production)
+        add_production = Production(code_production=production.code_production, un=production.un, nom_production=production.nom_production)
+        session.add(add_production)
         session.commit()
-        return {"message": "Production créée avec succès", "production": [{"code_production": production.code_production, "un": production.un, "nom_production": production.nom_production}]}
+        return {"message": "Production créée avec succès", "production": production.model_dump()}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

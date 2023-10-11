@@ -18,14 +18,17 @@ def create_production(production: ProductionBase):
     - Status code 201 si tout s'est bien passé avec message de confirmation
     - Message d'erreur avec le status code correspondant sinon
     """
-    try:
-        productions = session.query(Production).all()
-        for code_production, un, nom_production in productions:
-            print(code_production, un, nom_production)
-        if production in productions:
-            raise Exception("Unite déjà existante")
+    productions = session.query(Production).all()
 
-        return {"message": "Unite créée avec succès", "status": 201, "production": productions}
+    for code_production in productions:
+        if code_production.code_production == production.code_production:
+            return {"message": "Production déjà existante", "status": 400}
+
+    try:
+        production = Production(code_production=production.code_production, un=production.un, nom_production=production.nom_production)
+        session.add(production)
+        session.commit()
+        return {"message": "Production créée avec succès", "status": 201, "production": production.code_production}
 
     except Exception as e:
         return {"message": str(e), "status": 400}

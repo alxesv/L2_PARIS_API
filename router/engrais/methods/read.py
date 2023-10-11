@@ -52,7 +52,7 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
         data = [engrais for engrais in data if engrais.un == un]
 
     if len(data) == 0:
-        return {"message": "Aucune unite trouvée", "status": 404}
+        return {"message": "Aucun engrais trouvé", "status": 404}
 
     if skip >= len(data):
         return {"message": "Skip est plus grand que le nombre d'unite", "status": 400}

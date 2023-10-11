@@ -6,6 +6,7 @@ from models import Unite
 @router.get("/")
 def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
     """
+    Récupère les lignes de la table unite
     ### Paramètres
     - skip: nombre d'éléments à sauter
     - limit: nombre d'éléments à retourner
@@ -56,6 +57,7 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
 @router.get("/{unite}")
 def read_unite(unite: str):
     """
+    Récupère une ligne de la table unite
     ### Paramètres
     - unite: le nom de l'unite
     ### Retour

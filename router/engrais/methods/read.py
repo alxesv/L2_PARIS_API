@@ -25,6 +25,7 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     sortable = Engrais.__table__.columns.keys()
 
     if sort is not None:
+        sort_criteria = []
         sort_url = ""
         sort = sort.split(",")
         for s in sort:
@@ -35,14 +36,15 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
             if check_sort not in sortable:
                 raise HTTPException(status_code=400, detail=f"Le champ de tri {check_sort} n'existe pas")
             if s[0] == "-":
-                data = session.query(Engrais).order_by(getattr(Engrais, s[1:]).desc()).all()
+                sort_criteria.append(getattr(Engrais, s[1:]).desc())
                 sort_url += f"-{s[1:]},"
             else:
-                data = session.query(Engrais).order_by(getattr(Engrais, s)).all()
+                sort_criteria.append(getattr(Engrais, s))
                 sort_url += f"{s},"
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
+        data = session.query(Engrais).order_by(*sort_criteria).all()
 
 
     if un is not None:

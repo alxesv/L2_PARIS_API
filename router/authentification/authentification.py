@@ -1,3 +1,4 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/authentification", tags=['authentification'])
+router = APIRouter(prefix="/auth", tags=['authentification'])
+from .methods.jwt import *

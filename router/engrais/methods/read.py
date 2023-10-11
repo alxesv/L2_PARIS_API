@@ -1,10 +1,9 @@
 from database import session
 from router.engrais.engrais import router
 from models import Engrais
-from models import Unite
+from fastapi import HTTPException
 
-
-@router.get("/")
+@router.get("/", status_code=200)
 def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None):
     """
     Récupère les lignes de la table engrais
@@ -34,7 +33,7 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
             else:
                 check_sort = s
             if check_sort not in sortable:
-                return {"message": f"Le champ de tri {check_sort} n'existe pas", "status": 400}
+                raise HTTPException(status_code=400, detail=f"Le champ de tri {check_sort} n'existe pas")
             if s[0] == "-":
                 data = session.query(Engrais).order_by(getattr(Engrais, s[1:]).desc()).all()
                 sort_url += f"-{s[1:]},"
@@ -48,14 +47,14 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
 
     if un is not None:
         if not any(engrais.un == un for engrais in data):
-            return {"message": "Unite non trouvée", "status": 404}
+            raise HTTPException(status_code=404, detail="Unite non trouvée")
         data = [engrais for engrais in data if engrais.un == un]
 
     if len(data) == 0:
-        return {"message": "Aucun engrais trouvé", "status": 404}
+        raise HTTPException(status_code=404, detail="Aucun engrais trouvé")
 
     if skip >= len(data):
-        return {"message": "Skip est plus grand que le nombre d'unite", "status": 400}
+        raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre d'engrais")
 
     if limit > len(data):
         limit = len(data)
@@ -63,7 +62,7 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     if url[-1] != "?":
         url += "&"
 
-    response = {"status": 200, "engrais": data[skip:skip + limit]}
+    response = {"engrais": data[skip:skip + limit]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -72,7 +71,7 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
 
     return response
 
-@router.get("/{id_engrais}")
+@router.get("/{id_engrais}", status_code=200)
 def read_engrais_by_id(id_engrais: int):
     """
     Récupère une ligne dans la table engrais
@@ -86,6 +85,6 @@ def read_engrais_by_id(id_engrais: int):
     data = session.query(Engrais).filter(Engrais.id_engrais == id_engrais).first()
 
     if not data:
-        return {"message": "Engrais introuvable", "status": 404}
+        raise HTTPException(status_code=404, detail="Engrais non trouvé")
 
-    return {"status": 200, "engrais": data}
+    return {"engrais": data}

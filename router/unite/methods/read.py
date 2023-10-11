@@ -1,9 +1,9 @@
 from database import session
 from router.unite.unite import router
 from models import Unite
+from fastapi import HTTPException
 
-
-@router.get("/")
+@router.get("/", status_code=200)
 def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
     """
     Récupère les lignes de la table unite
@@ -35,10 +35,10 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
         data = session.query(Unite).all()
 
     if len(data) == 0:
-        return {"message": "Aucune unite trouvée", "status": 404}
+        raise HTTPException(status_code=404, detail="Aucune unite trouvée")
 
     if skip >= len(data):
-        return {"message": "Skip est plus grand que le nombre d'unite", "status": 400}
+        raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre d'unite")
 
     if limit > len(data):
         limit = len(data)
@@ -46,7 +46,7 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
     if url[-1] != "?":
         url += "&"
 
-    response = {"status": 200, "unites": [un.un for un in data[skip:skip + limit]]}
+    response = {"unites": [un.un for un in data[skip:skip + limit]]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -55,7 +55,7 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
 
     return response
 
-@router.get("/{unite}")
+@router.get("/{unite}", status_code=200)
 def read_unite(unite: str):
     """
     Récupère une ligne de la table unite
@@ -70,6 +70,6 @@ def read_unite(unite: str):
     data = session.query(Unite).filter(Unite.un == unite).first()
 
     if not data:
-        return {"message": "Unite introuvable", "status": 404}
+        raise HTTPException(status_code=404, detail="Unite non trouvée")
 
-    return {"status": 200, "unite": data.un}
+    return {"unite": data.un}

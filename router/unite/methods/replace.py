@@ -18,6 +18,13 @@ def replace_unite(unite: str, new_unite: UniteBase):
     - un status code correspondant
     """
     unites = session.query(Unite).all()
+
+    if len(new_unite.un) == 0:
+        return {"message": "Unite vide", "status": 400}
+
+    if new_unite.un in [un.un for un in unites]:
+        return {"message": "Unite déjà existante", "status": 400}
+
     for un in unites:
         if un.un == unite:
             un.un = new_unite.un

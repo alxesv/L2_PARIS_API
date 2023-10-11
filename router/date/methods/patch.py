@@ -1,19 +1,18 @@
-
 from database import session
-from router.date.date import (router)
+from router.date.date import router
 from models import Date
 from pydantic import BaseModel
 
 class DateBase(BaseModel):
     date: str
 
-@router.put("/{datetime}")
-def replace_date(datetime: str, new_date: DateBase):
+@router.patch("/{datetime}")
+def update_date(datetime: str, new_date: DateBase):
     """
-    Remplace une ligne dans la table date
+    Modifie une ligne dans la table unite
     ### Paramètres
-    - date: la date
-    - new_date: objet de type Date, avec le champs date
+    - unite: le nom de l'unite
+    - new_unite: objet de type Unite, avec le champs un
     ### Retour
     - un message de confirmation ou d'erreur
     - un status code correspondant
@@ -23,6 +22,6 @@ def replace_date(datetime: str, new_date: DateBase):
         if date.date == datetime:
             date.date = new_date.date
             session.commit()
-            return {"message": "Date remplacée avec succès", "status": 200}
+            return {"message": "Date modifiée avec succès", "status": 200}
 
     return {"message": "Date non trouvée", "status": 404}

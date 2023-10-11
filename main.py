@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from router.unite.unite import router as unite_router
+from router.production.production import router as production_router
 from router.engrais.engrais import router as engrais_router
 from router.element_chimique.element_chimique import router as element_chimique_router
 from router.authentification.authentification import router as authentification_router
@@ -55,6 +56,8 @@ app.include_router(unite_router, prefix="/api")
 app.include_router(engrais_router, prefix="/api")
 app.include_router(element_chimique_router, prefix="/api")
 app.include_router(authentification_router, prefix="/api")
+app.include_router(production_router, prefix="/api")
+
 
 
 @app.get("/")

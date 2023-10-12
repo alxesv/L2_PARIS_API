@@ -81,7 +81,6 @@ def read_element_chimique(code_element: str):
     """
 
     data = session.query(ElementChimique).filter(ElementChimique.code_element == code_element).first()
-    print(data.posseder)
 
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Élément introuvable")

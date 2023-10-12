@@ -76,3 +76,72 @@ def read_compteurs(skip: int = 0, limit: int = 10, sort: str = None, methode: st
     if skip > 0:
         response["previousPage"] = f"{url}skip={str(skip - limit)}&limit={str(limit)}"
     return response
+
+@router.get("/stats", status_code=200)
+def read_stats():
+    """
+    Récupère les statistiques de la table compteur
+    ### Retour
+    - un objet contenant les statistiques
+    - un message d'erreur en cas d'erreur
+    - un status code correspondant
+    """
+
+    methods = session.query(Compteur.methode).distinct().all()
+    method_count = {methods[i][0]: session.query(Compteur).filter(Compteur.methode == methods[i][0]).count() for i in
+                    range(len(methods))}
+    method_count = dict(sorted(method_count.items(), key=lambda x: x[1], reverse=True))
+
+    routes = session.query(Compteur.route).distinct().all()
+    route_count = {routes[i][0]: session.query(Compteur).filter(Compteur.route == routes[i][0]).count() for i in
+               range(len(routes))}
+    route_count = dict(sorted(route_count.items(), key=lambda x: x[1], reverse=True))
+    total_route_count = {}
+    for key, value in route_count.items():
+        if key.split("/")[2] not in total_route_count:
+            total_route_count.update({key.split("/")[2]: value})
+        else:
+            total_route_count[key.split("/")[2]] += value
+    total_route_count = dict(sorted(total_route_count.items(), key=lambda x: x[1], reverse=True))
+
+    methods_percentages = {methods[i][0]: session.query(Compteur).filter(Compteur.methode == methods[i][0]).count() / session.query(Compteur).count() * 100 for i in
+                    range(len(methods))}
+    methods_percentages = dict(sorted(methods_percentages.items(), key=lambda x: x[1], reverse=True))
+    for key, value in methods_percentages.items():
+        methods_percentages[key] = round(value, 2)
+
+    routes_percentages = {routes[i][0]: session.query(Compteur).filter(Compteur.route == routes[i][0]).count() / session.query(Compteur).count() * 100 for i in
+                range(len(routes))}
+    routes_percentages = dict(sorted(routes_percentages.items(), key=lambda x: x[1], reverse=True))
+    for key, value in routes_percentages.items():
+        routes_percentages[key] = round(value, 2)
+
+
+
+
+    reponse = {"methode_count": method_count, "route_count": total_route_count, "percentages": {"methodes": methods_percentages, "routes": routes_percentages}}
+    return reponse
+
+@router.get("/stats/{route}", status_code=200)
+def read_stats_by_route(route: str):
+    """
+    Récupère les statistiques de la table compteur pour une route
+    ### Paramètres
+    - route: la route
+    ### Retour
+    - un objet contenant les statistiques
+    - un message d'erreur en cas d'erreur
+    - un status code correspondant
+    """
+    routes = session.query(Compteur.route).filter(Compteur.route.like(f"%/api/{route}%")).distinct().all()
+    route_count = {routes[i][0]: session.query(Compteur).filter(Compteur.route == routes[i][0]).count() for i in
+                  range(len(routes))}
+    route_count = dict(sorted(route_count.items(), key=lambda x: x[1], reverse=True))
+
+    methods = session.query(Compteur.methode).filter(Compteur.route.like(f"%/api/{route}%")).distinct().all()
+    method_count = {methods[i][0]: session.query(Compteur).filter(Compteur.route.like(f"%/api/{route}%")).filter(Compteur.methode == methods[i][0]).count() for i in
+                    range(len(methods))}
+    method_count = dict(sorted(method_count.items(), key=lambda x: x[1], reverse=True))
+
+
+    return {"methodes": method_count, "routes": route_count}

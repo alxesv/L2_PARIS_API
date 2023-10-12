@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=200)
-def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None):
+def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, populate: bool = False):
     """
     Récupère les lignes de la table engrais
     ### Paramètres
@@ -21,8 +21,11 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     """
     url = f"http://127.0.0.1:8000/engrais?"
 
-    data = (session.query(Engrais)
-            .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
+    if populate is not False:
+        data = (session.query(Engrais)
+                .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
+    else:
+        data = (session.query(Engrais).all())
 
     sortable = Engrais.__table__.columns.keys()
 
@@ -46,8 +49,11 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = (session.query(Engrais).order_by(*sort_criteria)
-                .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
+        if populate is not False:
+            data = (session.query(Engrais).order_by(*sort_criteria)
+                    .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
+        else:
+            data = (session.query(Engrais).order_by(*sort_criteria).all())
 
 
     if un is not None:
@@ -77,7 +83,7 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     return response
 
 @router.get("/{id_engrais}", status_code=200)
-def read_engrais_by_id(id_engrais: int):
+def read_engrais_by_id(id_engrais: int, populate: bool = False):
     """
     Récupère une ligne dans la table engrais
     ### Paramètres
@@ -87,8 +93,12 @@ def read_engrais_by_id(id_engrais: int):
     - un object de type Engrais
     - un status code correspondant
     """
-    data = (session.query(Engrais).filter(Engrais.id_engrais == id_engrais)
-            .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).first())
+
+    if populate is not False:
+        data = (session.query(Engrais).filter(Engrais.id_engrais == id_engrais)
+                .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).first())
+    else:
+        data = (session.query(Engrais).filter(Engrais.id_engrais == id_engrais).first())
 
     if not data:
         raise HTTPException(status_code=404, detail="Engrais non trouvé")

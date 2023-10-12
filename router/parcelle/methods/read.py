@@ -6,7 +6,8 @@ from sqlalchemy.orm import joinedload
 
 
 @router.get("/", status_code=201)
-def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:int=None, surface:int=None, nom_parcelle:str=None, coordonnees:str=None):
+def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:int=None
+                   , surface:int=None, nom_parcelle:str=None, coordonnees:str=None, populate: bool = False):
     """
     Récupère les lignes de la table parcelle
     ### Paramètres
@@ -17,7 +18,10 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
     - un message d'erreur en cas d'erreur
     - un status code correspondant
     """
-    data = session.query(Parcelle).options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).all()
+    if populate is not False:
+        data = session.query(Parcelle).options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).all()
+    else:
+        data = session.query(Parcelle).all()
 
     url = f"http://127.0.0.1:8000/parcelle?"
 
@@ -43,9 +47,11 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = (session.query(Parcelle).order_by(*sort_criteria)
-                .options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).all())
-
+        if populate is not False:
+            data = (session.query(Parcelle).order_by(*sort_criteria)
+                    .options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).all())
+        else:
+            data = (session.query(Parcelle).order_by(*sort_criteria).all())
 
 
     if surface is not None and surface > 0:
@@ -86,7 +92,7 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
     return response
 
 @router.get("/{parcelle}", status_code=201)
-def read_parcelle(parcelle: int):
+def read_parcelle(parcelle: int, populate: bool = False):
     """
     Récupère une ligne de la table parcelle
     ### Paramètres
@@ -97,8 +103,11 @@ def read_parcelle(parcelle: int):
     - un status code correspondant
     """
 
-    data = (session.query(Parcelle).filter(Parcelle.no_parcelle == parcelle)
-            .options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).first())
+    if populate is not False:
+        data = (session.query(Parcelle).filter(Parcelle.no_parcelle == parcelle)
+                .options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).first())
+    else:
+        data = (session.query(Parcelle).filter(Parcelle.no_parcelle == parcelle).first())
 
     if not data:
         raise HTTPException(status_code=404, detail="Parcelle introuvable")

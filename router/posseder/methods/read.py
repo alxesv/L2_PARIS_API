@@ -6,7 +6,8 @@ from sqlalchemy.orm import joinedload
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: int = None, code_element: str = None, valeur: int = None):
+def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: int = None, code_element: str = None
+                  , valeur: int = None, populate: bool = False):
     """
     Récupère  les lignes de la table posseder
     ### Paramètres
@@ -20,7 +21,10 @@ def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
     - un objet JSON contenant  les lignes de la table posseder, filtrées et/ou triées
     - un status code correspondant
     """
-    data = session.query(Posseder).options(joinedload(Posseder.engrais), joinedload(Posseder.element_chimique)).all()
+    if populate is not False:
+        data = session.query(Posseder).options(joinedload(Posseder.engrais), joinedload(Posseder.element_chimique)).all()
+    else:
+        data = session.query(Posseder).all()
 
     url = f"http://127.0.0.1:8000/posseder?"
 
@@ -46,7 +50,11 @@ def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = session.query(Posseder).order_by(*sort_criteria).options(joinedload(Posseder.engrais), joinedload(Posseder.element_chimique)).all()
+        if populate is not False:
+            data = (session.query(Posseder).order_by(*sort_criteria)
+                    .options(joinedload(Posseder.engrais), joinedload(Posseder.element_chimique)).all())
+        else:
+            data = (session.query(Posseder).order_by(*sort_criteria).all())
 
     if id_engrais is not None:
         if not any(posseder.id_engrais == id_engrais for posseder in data):

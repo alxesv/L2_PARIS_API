@@ -6,7 +6,8 @@ from sqlalchemy.orm import joinedload
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, nom_production: str = None):
+def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str = None
+                     , nom_production: str = None, populate: bool = False):
     """
     Récupère les lignes de la table production
     ### Paramètres
@@ -20,7 +21,10 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
 
     url = f"http://127.0.0.1:8000/production?"
 
-    data = (session.query(Production).options(joinedload(Production.cultures), joinedload(Production.unite)).all())
+    if populate is not False:
+        data = (session.query(Production).options(joinedload(Production.cultures), joinedload(Production.unite)).all())
+    else:
+        data = (session.query(Production).all())
 
     sortable = Production.__table__.columns.keys()
 
@@ -44,8 +48,11 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = (session.query(Production).order_by(*sort_criteria)
-                .options(joinedload(Production.cultures), joinedload(Production.unite)).all())
+        if populate is not False:
+            data = (session.query(Production).order_by(*sort_criteria)
+                    .options(joinedload(Production.cultures), joinedload(Production.unite)).all())
+        else:
+            data = (session.query(Production).order_by(*sort_criteria).all())
 
     if un is not None:
         if not any(production.un == un for production in data):
@@ -79,7 +86,7 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     return response
 
 @router.get("/{code_production}", status_code=status.HTTP_200_OK)
-def read_code_production(code_production: int):
+def read_code_production(code_production: int, populate: bool = False):
     """
     Récupère une ligne de la table production
     ### Paramètres
@@ -90,8 +97,11 @@ def read_code_production(code_production: int):
     - un status code correspondant
     """
 
-    data = (session.query(Production).filter(Production.code_production == code_production)
-            .options(joinedload(Production.cultures), joinedload(Production.unite)).first())
+    if populate is not False:
+        data = (session.query(Production).filter(Production.code_production == code_production)
+                .options(joinedload(Production.cultures), joinedload(Production.unite)).first())
+    else:
+        data = (session.query(Production).filter(Production.code_production == code_production).first())
 
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unite introuvable")

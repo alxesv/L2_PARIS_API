@@ -1,42 +1,49 @@
 from database import session
-from router.production.production import router
-from models import Production, Unite
+from router.culture.culture import router
+from models import Culture, Parcelle, Production
 from pydantic import BaseModel
 from fastapi import HTTPException, status
 
-class ProductionBase(BaseModel):
-    un: str
-    nom_production: str
-@router.put("/{code_production}", status_code=status.HTTP_200_OK)
-def replace_production(code_production: int, new_production: ProductionBase):
+
+class CultureBase(BaseModel):
+    no_parcelle: int
+    code_production: int
+    date_debut: str
+    date_fin: str
+    qte_recoltee: int
+
+
+@router.put("/{identifiant_culture}", status_code=status.HTTP_200_OK)
+def replace_culture(identifiant_culture: int, new_culture: CultureBase):
     """
-    Remplace une ligne dans la table production
+    Remplace une ligne dans la table Culture
     ### Paramètres
-    - code_production: le code de la production
-    - new_production: objet de type Production, avec les champs un et nom_production
+    - identifiant_culture: Identifiant de la culture à remplacé
+    - new_culture: objet de type Culture, avec les champs relatifs à Culture
     ### Retour
     - un message de confirmation ou d'erreur
     - un status code correspondant
     """
-    all_productions = session.query(Production).all()
+    all_culture = session.query(Culture).all()
 
-    if not any(production.code_production == code_production for production in all_productions):
-        raise HTTPException(status_code=404, detail="Production non trouvée")
+    if not any(culture.identifiant_culture == identifiant_culture for culture in all_culture):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Culture non trouvée")
 
-    if new_production.un is not None:
-        all_unites = session.query(Unite).all()
-        if not any(unite.un == new_production.un for unite in all_unites):
-            raise HTTPException(status_code=404, detail="Unite non trouvée")
-    if new_production.nom_production is not None:
-        for production in all_productions:
-            if production.nom_production == new_production.nom_production and production.code_production != code_production:
-                raise HTTPException(status_code=400, detail="Production déjà existante")
+    if new_culture.no_parcelle is not None:
+        all_parcelles = session.query(Parcelle).all()
+        if not any(parcelle.no_parcelle == new_culture.no_parcelle for parcelle in all_parcelles):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parcelle non trouvée")
+
+    if new_culture.code_production is not None:
+        all_productions = session.query(Production).all()
+        if not any(production.code_production == new_culture.code_production for production in all_productions):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Production non trouvée")
 
     try:
-        production = session.query(Production).filter(Production.code_production == code_production).first()
-        for (key, value) in new_production:
-            setattr(production, key, value)
+        culture = session.query(Culture).filter(Culture.identifiant_culture == identifiant_culture).first()
+        for (key, value) in new_culture:
+            setattr(culture, key, value)
         session.commit()
-        return {"message": "Production modifiée avec succès", "production": new_production.model_dump()}
+        return {"message": "Culture modifiée avec succès", "culture": new_culture.model_dump()}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

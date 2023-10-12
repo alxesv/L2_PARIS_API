@@ -134,6 +134,8 @@ def read_stats_by_route(route: str):
     - un status code correspondant
     """
     routes = session.query(Compteur.route).filter(Compteur.route.like(f"%/api/{route}%")).distinct().all()
+    if len(routes) == 0:
+        raise HTTPException(status_code=404, detail="Route non trouvée")
     route_count = {routes[i][0]: session.query(Compteur).filter(Compteur.route == routes[i][0]).count() for i in
                   range(len(routes))}
     route_count = dict(sorted(route_count.items(), key=lambda x: x[1], reverse=True))

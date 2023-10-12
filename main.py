@@ -1,8 +1,11 @@
+from datetime import datetime
 from typing import Union
-
-from fastapi import FastAPI, Request
+from database import session
+from models import Compteur
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 
+from router.compteur.compteur import router as compteur_router
 from router.epandre.epandre import router as epandre_router
 from router.unite.unite import router as unite_router
 from router.production.production import router as production_router
@@ -53,12 +56,47 @@ async def verify_token(request: Request, call_next):
     else:
         return await call_next(request)
 
+@app.middleware("http")
+async def add_compteur(request: Request, call_next):
+    """
+    Ajoute une ligne dans la table compteur
+    request param = details on the request
+    call_next     = call the function next the middleware
+    """
+    routes = [
+    "engrais",
+    "unite",
+    "element_chimique",
+    "production",
+    "epandre",
+    "compteur",
+    "culture",
+    "date",
+    "parcelle",
+    "posseder"
+    ]
+    if request.url.path.startswith("/api") and request.headers.get('referer') is None and request.url.path.split("/")[2] in routes:
+        try:
+            compteur = Compteur(
+                horodatage=datetime.now(),
+                route=request.url.path,
+                methode=request.method
+            )
+            session.add(compteur)
+            session.commit()
+
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+    response = await call_next(request)
+    return response
+
 app.include_router(epandre_router, prefix="/api")
 app.include_router(unite_router, prefix="/api")
 app.include_router(engrais_router, prefix="/api")
 app.include_router(element_chimique_router, prefix="/api")
 app.include_router(authentification_router, prefix="/api")
 app.include_router(production_router, prefix="/api")
+app.include_router(compteur_router, prefix="/api")
 app.include_router(posseder_router, prefix="/api")
 app.include_router(culture_router, prefix="/api")
 

@@ -2,9 +2,11 @@ from database import session
 from router.element_chimique.element_chimique import router
 from models import ElementChimique
 from fastapi import HTTPException, status
+from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, libelle_element: str = None):
+def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None
+                           , un: str = None, libelle_element: str = None, populate: bool = False):
     """
     Récupère les lignes de la table Element_Chimique
     ### Paramètres
@@ -19,7 +21,10 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un:
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    data = session.query(ElementChimique).all()
+    if populate is not False:
+      data = session.query(ElementChimique).options(joinedload(ElementChimique.posseder), joinedload(ElementChimique.unite)).all()
+    else:
+      data = session.query(ElementChimique).all()
 
     url = f"http://127.0.0.1:8000/api/element_chimique?"
 
@@ -46,7 +51,10 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un:
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = session.query(ElementChimique).order_by(*sort_criteria).all()
+        if populate is not False:
+          data = session.query(ElementChimique).order_by(*sort_criteria).options(joinedload(ElementChimique.posseder), joinedload(ElementChimique.unite)).all()
+        else:
+          data = session.query(ElementChimique).order_by(*sort_criteria).all()
 
     if un is not None:
         if not any(element_chimique.un == un for element_chimique in data):
@@ -81,7 +89,7 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un:
 
 
 @router.get("/{code_element}", status_code=status.HTTP_200_OK)
-def read_element_chimique_by_code_element(code_element: str):
+def read_element_chimique_by_code_element(code_element: str, populate: bool = False):
     """
     Récupère une ligne de la table Element_Chimique
     ### Paramètres
@@ -92,7 +100,11 @@ def read_element_chimique_by_code_element(code_element: str):
     - un status code correspondant
     """
 
-    data = session.query(ElementChimique).filter(ElementChimique.code_element == code_element).first()
+    if populate is not False:
+        data = (session.query(ElementChimique).filter(ElementChimique.code_element == code_element)
+                .options(joinedload(ElementChimique.posseder), joinedload(ElementChimique.unite)).first())
+    else:
+        data = session.query(ElementChimique).filter(ElementChimique.code_element == code_element).first()
 
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Élément chimique introuvable")

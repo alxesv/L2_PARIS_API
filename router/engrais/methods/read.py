@@ -2,9 +2,10 @@ from database import session
 from router.engrais.engrais import router
 from models import Engrais
 from fastapi import HTTPException, status
+from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None):
+def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, populate: bool = False):
     """
     Récupère les lignes de la table engrais
     ### Paramètres
@@ -18,7 +19,13 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    data = session.query(Engrais).all()
+    url = f"http://127.0.0.1:8000/engrais?"
+
+    if populate is not False:
+        data = (session.query(Engrais)
+                .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
+    else:
+        data = (session.query(Engrais).all())
 
     url = f"http://127.0.0.1:8000/api/engrais?"
 
@@ -44,7 +51,11 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = session.query(Engrais).order_by(*sort_criteria).all()
+        if populate is not False:
+            data = (session.query(Engrais).order_by(*sort_criteria)
+                    .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
+        else:
+            data = (session.query(Engrais).order_by(*sort_criteria).all())
 
 
     if un is not None:
@@ -72,9 +83,9 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
         response["previousPage"] = f"{url}skip={str(skip - limit)}&limit={str(limit)}"
 
     return response
-
+  
 @router.get("/{id_engrais}", status_code=status.HTTP_200_OK)
-def read_engrais_by_id_engrais(id_engrais: int):
+def read_engrais_by_id_engrais(id_engrais: int, populate: bool = False):
     """
     Récupère une ligne dans la table Engrais
     ### Paramètres
@@ -84,7 +95,12 @@ def read_engrais_by_id_engrais(id_engrais: int):
     - un message de confirmation ou d'erreur
     - un status code correspondant
     """
-    data = session.query(Engrais).filter(Engrais.id_engrais == id_engrais).first()
+
+    if populate is not False:
+        data = (session.query(Engrais).filter(Engrais.id_engrais == id_engrais)
+                .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).first())
+    else:
+        data = (session.query(Engrais).filter(Engrais.id_engrais == id_engrais).first())
 
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Engrais introuvable")

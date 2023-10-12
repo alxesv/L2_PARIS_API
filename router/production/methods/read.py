@@ -2,9 +2,12 @@ from database import session
 from router.production.production import router
 from models import Production
 from fastapi import status, HTTPException
+from sqlalchemy.orm import joinedload
+
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str = None):
+def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str = None
+                     , nom_production: str = None, populate: bool = False):
     """
     Récupère les lignes de la table Production
     ### Paramètres
@@ -18,7 +21,12 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    data = session.query(Production).all()
+    url = f"http://127.0.0.1:8000/production?"
+
+    if populate is not False:
+        data = (session.query(Production).options(joinedload(Production.cultures), joinedload(Production.unite)).all())
+    else:
+        data = (session.query(Production).all())
 
     url = f"http://127.0.0.1:8000/api/production?"
 
@@ -44,7 +52,11 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = session.query(Production).order_by(*sort_criteria).all()
+        if populate is not False:
+            data = (session.query(Production).order_by(*sort_criteria)
+                    .options(joinedload(Production.cultures), joinedload(Production.unite)).all())
+        else:
+            data = (session.query(Production).order_by(*sort_criteria).all())
 
     if un is not None:
         if not any(production.un == un for production in data):
@@ -63,7 +75,7 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     if url[-1] != "?":
         url += "&"
 
-    response = {"productions": production for production in data[skip:skip + limit]}
+    response = {"productions": data[skip:skip + limit]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -73,7 +85,7 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     return response
 
 @router.get("/{code_production}", status_code=status.HTTP_200_OK)
-def read_production_by_code_production(code_production: int):
+def read_production_by_code_production(code_production: int, populate: bool = False):
     """
     Récupère une ligne de la table Production
     ### Paramètres
@@ -84,7 +96,11 @@ def read_production_by_code_production(code_production: int):
     - un status code correspondant
     """
 
-    data = session.query(Production).filter(Production.code_production == code_production).first()
+    if populate is not False:
+        data = (session.query(Production).filter(Production.code_production == code_production)
+                .options(joinedload(Production.cultures), joinedload(Production.unite)).first())
+    else:
+        data = (session.query(Production).filter(Production.code_production == code_production).first())
 
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Production introuvable")

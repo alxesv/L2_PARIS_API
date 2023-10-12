@@ -2,9 +2,12 @@ from database import session
 from router.epandre.epandre import router
 from models import Epandre, Date
 from fastapi import HTTPException, status
+from models import Date
+from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: int = None, no_parcelle: int = None, date: str = None, qte_epandue: int = None):
+def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: int = None
+                  , no_parcelle: int = None, date: str = None, qte_epandue: int = None, populate: bool = False):
     """
     Récupère  les lignes de la table Epandre
     ### Paramètres
@@ -21,7 +24,11 @@ def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    data = session.query(Epandre).all()
+    if populate is not False:
+        data = (session.query(Epandre)
+                .options(joinedload(Epandre.parcelle), joinedload(Epandre.engrais), joinedload(Epandre.date)).all())
+    else:
+        data = (session.query(Epandre).all())
 
     url = f"http://127.0.0.1:8000/api/epandre?"
 
@@ -50,7 +57,11 @@ def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = session.query(Epandre).order_by(*sort_criteria).all()
+        if populate is not False:
+            data = (session.query(Epandre).order_by(*sort_criteria)
+                    .options(joinedload(Epandre.parcelle), joinedload(Epandre.engrais), joinedload(Epandre.date)).all())
+        else:
+            data = (session.query(Epandre).order_by(*sort_criteria).all())
 
     if qte_epandue is not None and qte_epandue > 0:
         if not any(epandre.qte_epandue >= qte_epandue for epandre in data):
@@ -69,7 +80,7 @@ def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
 
     if date is not None:
         try:
-            date_object = session.query(Date).filter(Date.date == date).first()
+            date_object = (session.query(Date).filter(Date.date == date).first())
         except:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Date non existante")
         if not any(epandre.date == date_object for epandre in data):

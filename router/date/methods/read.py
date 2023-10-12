@@ -2,9 +2,11 @@ from database import session
 from router.date.date import router
 from models import Date
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
+
 
 @router.get("/",status_code=200)
-def read_dates(skip: int = 0, limit: int = 10, sort: str = None):
+def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool = False):
     """
     Récupère les lignes de la table date
     ### Paramètres
@@ -26,12 +28,18 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None):
         else:
             sort_url += f"{sort}"
             sort = getattr(Date, sort)
-        data = session.query(Date).order_by(sort).all()
+        if populate is not False:
+            data = session.query(Date).order_by(sort).options(joinedload(Date.epandres)).all()
+        else:
+            data = session.query(Date).order_by(sort).all()
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url}"
     else:
-        data = session.query(Date).all()
+        if populate is not False:
+            data = session.query(Date).options(joinedload(Date.epandres)).all()
+        else:
+            data = session.query(Date).all()
 
     if len(data) == 0:
         raise HTTPException(status_code=404,detail="Aucune date trouvée")
@@ -45,7 +53,7 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None):
     if url[-1] != "?":
         url += "&"
 
-    response = {"dates": [date.date for date in data[skip:skip + limit]]}
+    response = {"dates": data[skip:skip + limit]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -55,7 +63,7 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None):
     return response
 
 @router.get("/{datetime}",status_code=200)
-def read_date(datetime: str):
+def read_date(datetime: str, populate: bool = False):
     """
     Récupère une ligne de la table date
     ### Paramètres
@@ -66,9 +74,12 @@ def read_date(datetime: str):
     - un status code correspondant
     """
 
-    data = session.query(Date).filter(Date.date == datetime).first()
+    if populate is not False:
+        data = session.query(Date).filter(Date.date == datetime).options(joinedload(Date.epandres)).first()
+    else:
+        data = session.query(Date).filter(Date.date == datetime).first()
 
     if not data:
         raise HTTPException(status_code=404,detail="Date introuvable")
 
-    return {"date": data.date}
+    return {"date": data}

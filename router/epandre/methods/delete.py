@@ -1,23 +1,24 @@
 from database import session
 from router.epandre.epandre import router
-from models import Epandre
-from fastapi import HTTPException
-from models import Date
+from models import Epandre, Date
+from fastapi import HTTPException, status
 
-@router.delete("/", status_code=200)
+@router.delete("/", status_code=status.HTTP_200_OK)
 def delete_epandre(id_engrais: int, no_parcelle: int, date: str):
     """
-    Supprime une ligne dans la table epandre
+    Supprime une ligne dans la table Epandre
     ### Paramètres
-    - epandre_id: objet de type EpandrePrimary, avec les champs id_engrais, no_parcelle et date
+    - id_engrais: l'identifiant de l'engrais
+    - no_parcelle: le numéro de la parcelle
+    - date: la date de l'épandage
     ### Retour
-    - un message de confirmation ou d'erreur
-    - un status code correspondant
+    - Status code 200 si tout s'est bien passé avec message de confirmation
+    - Message d'erreur avec le status code correspondant sinon
     """
 
     dates = session.query(Date).all()
     if not any(orm_date.date == date for orm_date in dates):
-        raise HTTPException(status_code=404, detail="Date non trouvée")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune date trouvée")
     else:
         date_object = session.query(Date).filter(Date.date == date).first()
 
@@ -28,4 +29,4 @@ def delete_epandre(id_engrais: int, no_parcelle: int, date: str):
             session.delete(epandre)
             session.commit()
             return {"message": "Epandre supprimé avec succès", "deleted_epandre": deleted_epandre}
-    raise HTTPException(status_code=404, detail="Epandre non trouvé")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun épandage trouvé")

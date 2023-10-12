@@ -3,7 +3,6 @@ from router.element_chimique.element_chimique import router
 from models import ElementChimique
 from fastapi import HTTPException, status
 
-
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, libelle_element: str = None):
     """
@@ -15,7 +14,7 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un:
     - un : l'unité de l'élément chimique à filtrer
     - libelle_element: description de l'élément chimique à filtrer
     ### Retour
-    - un objet JSON contenant les lignes de la talbe Element_Chimique
+    - un objet JSON contenant les lignes de la talbe Element_Chimique, filtrées et/ou triées
     - un message d'erreur en cas d'erreur
     - un status code correspondant
     - url de navigation pour la pagination

@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 @router.delete("/{id_engrais}", status_code=status.HTTP_200_OK)
 def delete_engrais(id_engrais: int):
     """
-    Supprime une ligne dans la table engrais
+    Supprime une ligne dans la table Engrais
     ### Paramètres
     - id_engrais: l'identifiant de l'engrais
     ### Retour

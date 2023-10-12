@@ -4,7 +4,6 @@ from models import ElementChimique, Unite
 from fastapi import HTTPException, status
 from pydantic import BaseModel
 
-
 class ElementChimiqueBase(BaseModel):
     code_element: str
     un: str
@@ -31,8 +30,7 @@ def create_element_chimique(new_element_chimique: ElementChimiqueBase):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unité trouvée")
 
     try:
-        add_element_chimique = ElementChimique(code_element=new_element_chimique.code_element,
-                                           un=new_element_chimique.un, libelle_element=new_element_chimique.libelle_element)
+        add_element_chimique = ElementChimique(**new_element_chimique.__dict__)
         session.add(add_element_chimique)
         session.commit()
         return {"message": "Élément chimique créé avec succès", "element": new_element_chimique}

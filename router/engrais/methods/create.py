@@ -29,7 +29,7 @@ def create_engrais(new_engrais: EngraisBase):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unité trouvée")
 
     try:
-        add_engrais = Engrais(un=new_engrais.un, nom_engrais=new_engrais.nom_engrais)
+        add_engrais = Engrais(**new_engrais.__dict__)
         session.add(add_engrais)
         session.commit()
         return {"message": "Engrais créé avec succès", "engrais": new_engrais.model_dump()}

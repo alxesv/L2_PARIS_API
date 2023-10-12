@@ -1,7 +1,7 @@
 from database import session
 from router.epandre.epandre import router
 from models import Epandre
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from pydantic import BaseModel
 
 class EpandreBase(BaseModel):
@@ -10,8 +10,8 @@ class EpandreBase(BaseModel):
     date: str
     qte_epandue: int
 
-@router.patch('/', status_code=200)
-def modify_epandre(epandre_id: EpandreBase):
+@router.patch('/', status_code=status.HTTP_200_OK)
+def update_epandre(epandre_id: EpandreBase):
     """
     Modifie une ligne dans la table epandre
     ### Paramètres

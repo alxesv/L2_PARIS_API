@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from models import Date
 
 @router.delete("/", status_code=200)
-def delete_epandre(id_engrais: int = None, no_parcelle: int = None, date: str = None):
+def delete_epandre(id_engrais: int, no_parcelle: int, date: str):
     """
     Supprime une ligne dans la table epandre
     ### Paramètres
@@ -14,8 +14,6 @@ def delete_epandre(id_engrais: int = None, no_parcelle: int = None, date: str = 
     - un message de confirmation ou d'erreur
     - un status code correspondant
     """
-    if id_engrais is None or no_parcelle is None or date is None:
-        raise HTTPException(status_code=400, detail="Il manque au moins un paramètre")
 
     dates = session.query(Date).all()
     if not any(orm_date.date == date for orm_date in dates):

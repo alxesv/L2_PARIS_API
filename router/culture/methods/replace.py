@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from database import session
 from router.culture.culture import router
 from models import Culture, Parcelle, Production
@@ -38,6 +40,12 @@ def replace_culture(identifiant_culture: int, new_culture: CultureBase):
         all_productions = session.query(Production).all()
         if not any(production.code_production == new_culture.code_production for production in all_productions):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Production non trouvée")
+
+    date_debut = datetime.strptime(new_culture.date_debut, "%Y-%m-%d")
+    date_fin = datetime.strptime(new_culture.date_fin, "%Y-%m-%d")
+    if date_debut > date_fin:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="La date de début doit se trouver avant la date de fin")
 
     try:
         culture = session.query(Culture).filter(Culture.identifiant_culture == identifiant_culture).first()

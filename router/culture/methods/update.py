@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from database import session
 from router.culture.culture import router
 from models import Culture, Parcelle, Production
@@ -11,6 +13,14 @@ class CultureBase(BaseModel):
     date_debut: str = None
     date_fin: str = None
     qte_recoltee: int = None
+
+
+def compare_date(date_debut, date_fin):
+    debut = datetime.strptime(date_debut, "%Y-%m-%d")
+    fin = datetime.strptime(date_fin, "%Y-%m-%d")
+    if debut > fin:
+        return True
+    return False
 
 
 @router.patch("/{identifiant_culture}", status_code=status.HTTP_200_OK)
@@ -43,9 +53,23 @@ def update_culture(identifiant_culture: int, updated_culture: CultureBase):
         if not any(production.code_production == updated_culture.code_production for production in all_productions):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Production non trouvée")
 
-    try:
-        culture = session.query(Culture).filter(Culture.identifiant_culture == identifiant_culture).first()
+    culture = session.query(Culture).filter(Culture.identifiant_culture == identifiant_culture).first()
+    if updated_culture.date_debut is not None or updated_culture.date_fin is not None:
+        if updated_culture.date_debut is None:
+            debut = culture.date_debut
+        else:
+            debut = updated_culture.date_debut
+        if updated_culture.date_fin is None:
+            fin = culture.date_fin
+        else:
+            fin = updated_culture.date_fin
+        debut_after_end = compare_date(debut, fin)
+        print(debut_after_end)
+        if debut_after_end:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="La date de début doit se trouver avant la date de fin")
 
+    try:
         if updated_culture.no_parcelle is not None:
             culture.no_parcelle = updated_culture.no_parcelle
         else:

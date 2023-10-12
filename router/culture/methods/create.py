@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from database import session
 from router.culture.culture import router
 from models import Parcelle, Production, Culture
@@ -27,12 +29,6 @@ def create_culture(new_culture: CultureBase):
     - Status code 201 si tout s'est bien passé avec message de confirmation
     - Message d'erreur avec le status code correspondant sinon
     """
-
-    cultures = session.query(Culture).all()
-    for culture in cultures:
-        if culture.identifiant_culture == culture.identifiant_culture:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Culture déjà existante")
-
     parcelles = session.query(Parcelle).all()
     if not any(parcelle.no_parcelle == new_culture.no_parcelle for parcelle in parcelles):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Numéro de parcelle non trouvée")
@@ -40,6 +36,11 @@ def create_culture(new_culture: CultureBase):
     productions = session.query(Production).all()
     if not any(production.code_production == new_culture.code_production for production in productions):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Code de production non trouvée")
+
+    date_debut = datetime.strptime(new_culture.date_debut, "%Y-%m-%d")
+    date_fin = datetime.strptime(new_culture.date_fin, "%Y-%m-%d")
+    if date_debut > date_fin:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La date de début doit se trouver avant la date de fin")
 
     try:
         culture = Culture(**new_culture.__dict__)

@@ -6,21 +6,23 @@ from fastapi import HTTPException, status
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: int = None, code_element: str = None, valeur: int = None):
     """
-    Récupère  les lignes de la table posseder
+    Récupère  les lignes de la table Posseder
     ### Paramètres
     - skip: nombre de lignes à sauter
     - limit: nombre de lignes à récupérer
     - sort: le ou les champs sur lequel trier les résultats
     - id_engrais: le nom de l'engrais à filtrer
-    - code_element: le code de l'élément à filtrer
+    - code_element: le code de l'élément chimique à filtrer
     - valeur : la valeur à filtrer
     ### Retour
-    - un objet JSON contenant  les lignes de la table posseder, filtrées et/ou triées
+    - un objet JSON contenant  les lignes de la table Posseder, filtrées et/ou triées
+    - un message d'erreur en cas d'erreur
     - un status code correspondant
+    - url de navigation pour la pagination
     """
     data = session.query(Posseder).all()
 
-    url = f"http://127.0.0.1:8000/posseder?"
+    url = f"http://127.0.0.1:8000/api/posseder?"
 
     sortable = Posseder.__table__.columns.keys()
 
@@ -48,17 +50,17 @@ def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
 
     if id_engrais is not None:
         if not any(posseder.id_engrais == id_engrais for posseder in data):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Engrais non trouvé")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun engrais trouvé")
         data = [posseder for posseder in data if posseder.id_engrais == id_engrais]
 
     if code_element is not None:
         if not any(posseder.code_element == code_element for posseder in data):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Code de l'élément non trouvé")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun code d'élément chimique trouvé")
         data = [posseder for posseder in data if posseder.code_element == code_element]
 
     if valeur is not None and valeur > 0:
         if not any(posseder.valeur >= valeur for posseder in data):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Valeur non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune valeur trouvée")
         data = [posseder for posseder in data if posseder.valeur >= valeur]
 
     if len(data) == 0:

@@ -2,25 +2,25 @@ from database import session
 from router.production.production import router
 from models import Production
 from fastapi import status, HTTPException
-from sqlalchemy import asc, desc
-
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, nom_production: str = None):
+def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str = None):
     """
-    Récupère les lignes de la table production
+    Récupère les lignes de la table Production
     ### Paramètres
     - skip: nombre d'éléments à sauter
     - limit: nombre d'éléments à retourner
+    - sort: le ou les champs sur lequel trier les résultats
+    - un: le nom de l'unité à filtrer
     ### Retour
-    - un tableau d'objets de type Production
+    - un objet JSON contenant les lignes de la table Production, filtrées et/ou triées
     - un message d'erreur en cas d'erreur
     - un status code correspondant
+    - url de navigation pour la pagination
     """
-
-    url = f"http://127.0.0.1:8000/production?"
-
     data = session.query(Production).all()
+
+    url = f"http://127.0.0.1:8000/api/production?"
 
     sortable = Production.__table__.columns.keys()
 
@@ -48,13 +48,8 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
 
     if un is not None:
         if not any(production.un == un for production in data):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unite non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unité trouvée")
         data = [production for production in data if production.un == un]
-
-    if nom_production is not None:
-        if not any(production.nom_production == nom_production for production in data):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune production trouvée")
-        data = [production for production in data if production.nom_production == nom_production]
 
     if len(data) == 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Aucune production trouvée")
@@ -68,7 +63,7 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     if url[-1] != "?":
         url += "&"
 
-    response = {"productions": [{"code_production": data.code_production, "un": data.un, "nom_production": data.nom_production} for data in data[skip:skip + limit]]}
+    response = {"productions": production for production in data[skip:skip + limit]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -78,11 +73,11 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     return response
 
 @router.get("/{code_production}", status_code=status.HTTP_200_OK)
-def read_code_production(code_production: int):
+def read_production_by_code_production(code_production: int):
     """
-    Récupère une ligne de la table production
+    Récupère une ligne de la table Production
     ### Paramètres
-    - unite: le nom de l'unite de la production
+    - code_production: le code de la production
     ### Retour
     - un objet de type Production
     - un message d'erreur en cas d'erreur
@@ -92,6 +87,6 @@ def read_code_production(code_production: int):
     data = session.query(Production).filter(Production.code_production == code_production).first()
 
     if not data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unite introuvable")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Production introuvable")
 
     return {"production": data}

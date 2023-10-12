@@ -1,7 +1,6 @@
 from database import session
 from router.compteur.compteur import router
 from models import Compteur
-from sqlalchemy import asc, desc
 from fastapi import HTTPException, status
 
 

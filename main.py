@@ -10,6 +10,7 @@ from router.engrais.engrais import router as engrais_router
 from router.element_chimique.element_chimique import router as element_chimique_router
 from router.posseder.posseder import router as posseder_router
 from router.authentification.authentification import router as authentification_router
+from router.culture.culture import router as culture_router
 
 from jose import jwt
 
@@ -44,7 +45,6 @@ async def verify_token(request: Request, call_next):
                 return JSONResponse(status_code=403, content=return_message)
         else:
             return_message = {
-                "status": 401,
                 "message": "Aucun token de connexion envoyé",
             }
             return JSONResponse(status_code=401, content=return_message)
@@ -60,6 +60,7 @@ app.include_router(element_chimique_router, prefix="/api")
 app.include_router(authentification_router, prefix="/api")
 app.include_router(production_router, prefix="/api")
 app.include_router(posseder_router, prefix="/api")
+app.include_router(culture_router, prefix="/api")
 
 
 @app.get("/")

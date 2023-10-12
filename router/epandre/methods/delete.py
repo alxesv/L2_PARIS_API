@@ -16,6 +16,9 @@ def delete_epandre(id_engrais: int, no_parcelle: int, date: str):
     - Message d'erreur avec le status code correspondant sinon
     """
 
+    if id_engrais is None or no_parcelle is None or date is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Il manque au moins un paramètre")
+
     dates = session.query(Date).all()
     if not any(orm_date.date == date for orm_date in dates):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune date trouvée")

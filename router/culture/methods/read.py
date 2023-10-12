@@ -7,21 +7,27 @@ from models import Culture, Parcelle, Production
 from sqlalchemy import asc, desc
 from fastapi import HTTPException, status
 
-
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle: int = None, code_production: int = None, date_debut: str = None, date_fin: str = None, qte_recoltee: int = None):
     """
-    Récupère les lignes de la table élément chimique
+    Récupère les lignes de la table Culture
     ### Paramètres
     - skip: nombre d'éléments à sauter
     - limit: nombre d'éléments à retourner
+    - sort: le ou les champs sur lequel trier les résultats
+    - no_parcelle : Numéro de la parcelle attribué à cette culture à filtrer
+    - code_production : Code de la production attribué à cette culture à filtrer
+    - date_debut : Date du début de la culture à filtrer
+    - date_fin : Date de la fin de la culture à filtrer
+    - qte_recoltee : Quantitée récolté provenant de la culture à filtrer
     ### Retour
-    - un tableau d'objets de type Culture
+    - un objet JSON contenant  les lignes de la table Culture, filtrées et/ou triées
     - un message d'erreur en cas d'erreur
     - un status code correspondant
+    - url de navigation pour la pagination
     """
 
-    url = f"http://127.0.0.1:8000/culture?"
+    url = f"http://127.0.0.1:8000/api/culture?"
 
     sort_mapping = Culture.__table__.columns.keys()
 
@@ -76,7 +82,7 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
             # First exception is already raised, so do nothing
             pass
         except:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parcelle non existante")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune parcelle existante")
 
         data = [culture for culture in data if culture.no_parcelle == parcelle_object.no_parcelle]
 
@@ -89,7 +95,7 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
             # First exception is already raised, so do nothing
             pass
         except:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Production non existante")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune production existante")
 
         data = [culture for culture in data if culture.code_production == production_object.code_production]
 
@@ -105,7 +111,7 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
     if url[-1] != "?":
         url += "&"
 
-    response = { "cultures": [culture for culture in data[skip:skip + limit]] }
+    response = {"cultures": [culture for culture in data[skip:skip + limit]]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -116,9 +122,9 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
 
 
 @router.get("/{identifiant_culture}", status_code=status.HTTP_200_OK)
-def read_culture(identifiant_culture: int):
+def read_culture_by_identifiant_culture(identifiant_culture: int):
     """
-    Récupère une ligne de la table élément chimique
+    Récupère une ligne de la table Culture
     ### Paramètres
     - identifiant_culture: Identifiant de la culture voulue
     ### Retour
@@ -133,4 +139,4 @@ def read_culture(identifiant_culture: int):
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Culture introuvable")
 
-    return { "culture": data }
+    return {"culture": data}

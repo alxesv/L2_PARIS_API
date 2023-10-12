@@ -64,7 +64,6 @@ def update_culture(identifiant_culture: int, updated_culture: CultureBase):
         else:
             fin = updated_culture.date_fin
         debut_after_end = compare_date(debut, fin)
-        print(debut_after_end)
         if debut_after_end:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="La date de début doit se trouver avant la date de fin")

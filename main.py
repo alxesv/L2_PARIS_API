@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from router.unite.unite import router as unite_router
+from router.parcelle.parcelle import router as parcelle_router
 from router.authentification.authentification import router as authentification_router
 
 from jose import jwt
@@ -50,6 +51,7 @@ async def verify_token(request: Request, call_next):
 
 
 app.include_router(unite_router, prefix="/api")
+app.include_router(parcelle_router, prefix="/api")
 app.include_router(authentification_router, prefix="/api")
 
 

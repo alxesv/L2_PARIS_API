@@ -22,6 +22,7 @@ def create_unite(unite: UniteBase):
         if un.un == unite.un:
             return {"message": "Unite déjà existante", "status": 400}
 
+
     try:
         unite = Unite(un=unite.un)
         session.add(unite)

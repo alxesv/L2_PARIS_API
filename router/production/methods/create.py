@@ -6,7 +6,7 @@ from fastapi import status, HTTPException
 
 
 class ProductionBase(BaseModel):
-    code_production: int
+    code_production: int = None
     un: str
     nom_production: str
 @router.post("/", status_code=status.HTTP_201_CREATED)

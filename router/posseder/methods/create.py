@@ -23,15 +23,15 @@ def create_posseder(posseder: PossederBase):
 
     code_elements = session.query(ElementChimique).all()
     if not any(code_element.code_element == posseder.code_element for code_element in code_elements):
-        raise HTTPException(status_code=404, detail="Code de l'élément non trouvé")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Code de l'élément non trouvé")
 
     engrais = session.query(Engrais).all()
     if not any(engrais_item.id_engrais == posseder.id_engrais for engrais_item in engrais):
-        raise HTTPException(status_code=404, detail="Engrais non trouvé")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Engrais non trouvé")
 
     for posseder_item in posseders:
         if posseder_item.id_engrais == posseder.id_engrais and posseder_item.code_element == posseder.code_element:
-            raise HTTPException(status_code=400, detail="Possession déjà existante")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Possession déjà existante")
 
     try:
         add_posseder = Posseder(id_engrais=posseder.id_engrais, code_element=posseder.code_element, valeur=posseder.valeur)
@@ -40,4 +40,4 @@ def create_posseder(posseder: PossederBase):
         return {"message": "Posséssion créé avec succès", "posséder": posseder.model_dump()}
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

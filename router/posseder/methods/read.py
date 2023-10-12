@@ -34,7 +34,7 @@ def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
             else:
                 check_sort = s
             if check_sort not in sortable:
-                raise HTTPException(status_code=400, detail=f"Le champ de tri {check_sort} n'existe pas")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Le champ de tri {check_sort} n'existe pas")
             if s[0] == "-":
                 sort_criteria.append(getattr(Posseder, s[1:]).desc())
                 sort_url += f"-{s[1:]},"
@@ -48,24 +48,24 @@ def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
 
     if id_engrais is not None:
         if not any(posseder.id_engrais == id_engrais for posseder in data):
-            raise HTTPException(status_code=404, detail="Engrais non trouvé")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Engrais non trouvé")
         data = [posseder for posseder in data if posseder.id_engrais == id_engrais]
 
     if code_element is not None:
         if not any(posseder.code_element == code_element for posseder in data):
-            raise HTTPException(status_code=404, detail="Code de l'élément non trouvé")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Code de l'élément non trouvé")
         data = [posseder for posseder in data if posseder.code_element == code_element]
 
     if valeur is not None and valeur > 0:
         if not any(posseder.valeur >= valeur for posseder in data):
-            raise HTTPException(status_code=404, detail="Valeur non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Valeur non trouvée")
         data = [posseder for posseder in data if posseder.valeur >= valeur]
 
     if len(data) == 0:
-        raise HTTPException(status_code=404, detail="Aucune possession trouvée")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune possession trouvée")
 
     if skip >= len(data):
-        raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre de possession")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skip est plus grand que le nombre de possession")
 
     if limit > len(data):
         limit = len(data)

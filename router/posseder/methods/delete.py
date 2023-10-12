@@ -14,7 +14,7 @@ def delete_posseder(id_engrais: int, code_element: str):
     - un status code correspondant
     """
     if id_engrais is None or code_element is None:
-        raise HTTPException(status_code=400, detail="Il manque au moins un paramètre")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Il manque au moins un paramètre")
 
     posseders = session.query(Posseder).all()
     for posseder in posseders:
@@ -23,4 +23,4 @@ def delete_posseder(id_engrais: int, code_element: str):
             session.delete(posseder)
             session.commit()
             return {"message": "Possession supprimée avec succès", "deleted_posseder ": deleted_posseder}
-    raise HTTPException(status_code=404, detail="Possession non trouvée")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Possession non trouvée")

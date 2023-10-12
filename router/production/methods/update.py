@@ -20,21 +20,21 @@ def update_production(code_production: int, updated_production: ProductionBase):
     """
 
     if updated_production.nom_production is None and updated_production.un is None:
-        raise HTTPException(status_code=400, detail="Il manque un paramètre")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Il manque un paramètre")
 
     all_productions = session.query(Production).all()
 
     if not any(production.code_production == code_production for production in all_productions):
-        raise HTTPException(status_code=404, detail="Production non trouvée")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Production non trouvée")
 
     if updated_production.un is not None:
         all_unites = session.query(Unite).all()
         if not any(unite.un == updated_production.un for unite in all_unites):
-            raise HTTPException(status_code=404, detail="Unite non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unite non trouvée")
     if updated_production.nom_production is not None:
         for production in all_productions:
             if production.nom_production == updated_production.nom_production and production.code_production != code_production:
-                raise HTTPException(status_code=400, detail="Production déjà existante")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Production déjà existante")
 
     try:
         production = session.query(Production).filter(Production.code_production == code_production).first()
@@ -49,4 +49,4 @@ def update_production(code_production: int, updated_production: ProductionBase):
         session.commit()
         return {"message": "Production modifiée avec succès", "production": updated_production.model_dump()}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

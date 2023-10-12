@@ -23,12 +23,12 @@ def create_production(production: ProductionBase):
 
     for code_production in productions:
         if code_production.code_production == production.code_production:
-            raise HTTPException(status_code=400, detail="Production déjà existante")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Production déjà existante")
 
         if production.un is not None:
             all_unites = session.query(Unite).all()
             if not any(unite.un == production.un for unite in all_unites):
-                raise HTTPException(status_code=404, detail="Unite non trouvée")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unite non trouvée")
     try:
         add_production = Production(code_production=production.code_production, un=production.un, nom_production=production.nom_production)
         session.add(add_production)
@@ -36,4 +36,4 @@ def create_production(production: ProductionBase):
         return {"message": "Production créée avec succès", "production": production.model_dump()}
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

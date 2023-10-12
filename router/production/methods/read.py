@@ -34,7 +34,7 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
             else:
                 check_sort = s
             if check_sort not in sortable:
-                raise HTTPException(status_code=400, detail=f"Le champ de tri {check_sort} n'existe pas")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Le champ de tri {check_sort} n'existe pas")
             if s[0] == "-":
                 sort_criteria.append(getattr(Production, s[1:]).desc())
                 sort_url += f"-{s[1:]},"
@@ -57,10 +57,10 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
         data = [production for production in data if production.nom_production == nom_production]
 
     if len(data) == 0:
-        raise HTTPException(status_code=400, detail="Aucune production trouvée")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Aucune production trouvée")
 
     if skip >= len(data):
-        raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre de production")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skip est plus grand que le nombre de production")
 
     if limit > len(data):
         limit = len(data)
@@ -92,6 +92,6 @@ def read_code_production(code_production: int):
     data = session.query(Production).filter(Production.code_production == code_production).first()
 
     if not data:
-        raise HTTPException(status_code=404, detail="Unite introuvable")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unite introuvable")
 
     return {"production": data}

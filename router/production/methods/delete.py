@@ -20,4 +20,4 @@ def delete_production(production: int):
             session.commit()
             return {"message": "Production supprimée avec succès"}
 
-    raise HTTPException(status_code=404, detail="La production n'a pas été trouvée")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La production n'a pas été trouvée")

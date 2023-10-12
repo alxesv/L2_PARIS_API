@@ -6,12 +6,13 @@ from fastapi import HTTPException, status
 @router.delete("/", status_code=status.HTTP_200_OK)
 def delete_posseder(id_engrais: int, code_element: str):
     """
-    Supprime une ligne dans la table posseder
+    Supprime une ligne dans la table Posseder
     ### Paramètres
-    - posseder_id: objet de type PossederPrimary, avec les champs id_engrais et code_element
+    - id_engrais: l'identifiant de l'engraise
+    - code_element: le code de l'élément chimique
     ### Retour
-    - un message de confirmation ou d'erreur
-    - un status code correspondant
+    - Status code 200 si tout s'est bien passé avec message de confirmation
+    - Message d'erreur avec le status code correspondant sinon
     """
     if id_engrais is None or code_element is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Il manque au moins un paramètre")
@@ -23,4 +24,4 @@ def delete_posseder(id_engrais: int, code_element: str):
             session.delete(posseder)
             session.commit()
             return {"message": "Possession supprimée avec succès", "deleted_posseder ": deleted_posseder}
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Possession non trouvée")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune possession trouvée")

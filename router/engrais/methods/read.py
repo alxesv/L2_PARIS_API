@@ -1,10 +1,10 @@
 from database import session
 from router.engrais.engrais import router
 from models import Engrais
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
 
-@router.get("/", status_code=200)
+@router.get("/", status_code=status.HTTP_200_OK)
 def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, populate: bool = False):
     """
     Récupère les lignes de la table engrais
@@ -12,9 +12,9 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     - skip: nombre d'éléments à sauter
     - limit: nombre d'éléments à retourner
     - sort: le ou les champs sur lequel trier les résultats
-    - un: le nom de l'unite a filtrer
+    - un: le nom de l'unite à filtrer
     ### Retour
-    - un tableau d'objets de type Engrais
+    - un objet JSON contenant les lignes de la table Engrais, filtrées et/ou triées
     - un message d'erreur en cas d'erreur
     - un status code correspondant
     - url de navigation pour la pagination
@@ -26,6 +26,8 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
                 .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
     else:
         data = (session.query(Engrais).all())
+
+    url = f"http://127.0.0.1:8000/api/engrais?"
 
     sortable = Engrais.__table__.columns.keys()
 
@@ -39,7 +41,7 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
             else:
                 check_sort = s
             if check_sort not in sortable:
-                raise HTTPException(status_code=400, detail=f"Le champ de tri {check_sort} n'existe pas")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Le champ de tri {check_sort} n'existe pas")
             if s[0] == "-":
                 sort_criteria.append(getattr(Engrais, s[1:]).desc())
                 sort_url += f"-{s[1:]},"
@@ -58,14 +60,14 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
 
     if un is not None:
         if not any(engrais.un == un for engrais in data):
-            raise HTTPException(status_code=404, detail="Unite non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unité trouvée")
         data = [engrais for engrais in data if engrais.un == un]
 
     if len(data) == 0:
-        raise HTTPException(status_code=404, detail="Aucun engrais trouvé")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun engrais trouvé")
 
     if skip >= len(data):
-        raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre d'engrais")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skip est plus grand que le nombre d'engrais")
 
     if limit > len(data):
         limit = len(data)
@@ -81,16 +83,16 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
         response["previousPage"] = f"{url}skip={str(skip - limit)}&limit={str(limit)}"
 
     return response
-
-@router.get("/{id_engrais}", status_code=200)
-def read_engrais_by_id(id_engrais: int, populate: bool = False):
+  
+@router.get("/{id_engrais}", status_code=status.HTTP_200_OK)
+def read_engrais_by_id_engrais(id_engrais: int, populate: bool = False):
     """
-    Récupère une ligne dans la table engrais
+    Récupère une ligne dans la table Engrais
     ### Paramètres
     - id_engrais: l'identifiant de l'engrais
     ### Retour
-    - un message de confirmation ou d'erreur
     - un object de type Engrais
+    - un message de confirmation ou d'erreur
     - un status code correspondant
     """
 
@@ -101,6 +103,6 @@ def read_engrais_by_id(id_engrais: int, populate: bool = False):
         data = (session.query(Engrais).filter(Engrais.id_engrais == id_engrais).first())
 
     if not data:
-        raise HTTPException(status_code=404, detail="Engrais non trouvé")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Engrais introuvable")
 
     return {"engrais": data}

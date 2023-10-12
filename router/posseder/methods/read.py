@@ -15,7 +15,8 @@ def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
     - code_element: le code de l'élément à filtrer
     - valeur : la valeur à filtrer
     ### Retour
-    - un objet JSON contenant  les lignes de la table posseder, filtrées et/ou triées
+    - un objet JSON contenant  les lignes de la table Posseder, filtrées et/ou triées
+    - un message d'erreur en cas d'erreur
     - un status code correspondant
     """
     data = session.query(Posseder).all()

@@ -14,7 +14,7 @@ class ElementChimiqueBase(BaseModel):
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_element_chimique(new_element_chimique: ElementChimiqueBase):
     """
-   Ajoute une ligne dans la table unite
+   Ajoute une ligne dans la table Element_Chimique
     ### Paramètres
     - code_element : Code de l'élément chimique
     - un : Nom de l'unité
@@ -31,14 +31,14 @@ def create_element_chimique(new_element_chimique: ElementChimiqueBase):
 
     unites = session.query(Unite).all()
     if not any(un.un == new_element_chimique.un for un in unites):
-        raise HTTPException(status_code=404, detail="Unite non trouvée")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unité trouvée")
 
     try:
         element_chimique = ElementChimique(code_element=new_element_chimique.code_element,
                                            un=new_element_chimique.un, libelle_element=new_element_chimique.libelle_element)
         session.add(element_chimique)
         session.commit()
-        return {"message": "Élément créé avec succès", "element": new_element_chimique}
+        return {"message": "Élément chimique créé avec succès", "element": new_element_chimique}
 
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

@@ -7,12 +7,12 @@ from fastapi import HTTPException, status
 @router.delete("/{code_element}", status_code=status.HTTP_200_OK)
 def delete_element_chimique(code_element: str):
     """
-    Supprime une ligne dans la table engrais
+    Supprime une ligne dans la table Element_Chimique
     ### Paramètres
-    - id_engrais: l'identifiant de l'engrais
+    - code_element: code de l'élément chimique
     ### Retour
-    - un message de confirmation ou d'erreur
-    - un status code correspondant
+    - Status code 200 si tout s'est bien passé avec message de confirmation
+    - Message d'erreur avec le status code correspondant sinon
     """
     element_chimiques = session.query(ElementChimique).all()
     for element_chimique in element_chimiques:
@@ -21,4 +21,4 @@ def delete_element_chimique(code_element: str):
             session.delete(element_chimique)
             session.commit()
             return {"message": "Élément chimique supprimé avec succès", "deleted_element": deleted_engrais_name}
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Élément chimique non trouvé")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun élément chimique trouvé")

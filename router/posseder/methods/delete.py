@@ -4,7 +4,7 @@ from models import Posseder
 from fastapi import HTTPException, status
 
 @router.delete("/", status_code=status.HTTP_200_OK)
-def delete_posseder(id_engrais: int = None, code_element: str = None):
+def delete_posseder(id_engrais: int, code_element: str):
     """
     Supprime une ligne dans la table posseder
     ### Paramètres

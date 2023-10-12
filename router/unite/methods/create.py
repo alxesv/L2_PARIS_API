@@ -9,7 +9,7 @@ class UniteBase(BaseModel):
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_unite(new_unite: UniteBase):
     """
-   Ajoute une ligne dans la table Unite
+    Ajoute une ligne dans la table Unite
     ### Paramètres
     - new_unite: objet de type Unite, avec le champs un
     ### Retour

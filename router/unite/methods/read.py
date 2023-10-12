@@ -17,23 +17,34 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
     - un status code correspondant
     - url de navigation pour la pagination
     """
+    data = session.query(Unite).all()
 
     url = f"http://127.0.0.1:8000/api/unite?"
 
-    if sort and sort in ["un", "-un"]:
+    sortable = Unite.__table__.columns.keys()
+
+    if sort is not None:
+        sort_criteria = []
         sort_url = ""
-        if sort[0] == "-":
-            sort_url += f"{sort}"
-            sort = getattr(Unite, sort[1:]).desc()
-        else:
-            sort_url += f"{sort}"
-            sort = getattr(Unite, sort)
-        data = session.query(Unite).order_by(sort).all()
+        sort = sort.split(",")
+        for s in sort:
+            if s[0] == "-":
+                check_sort = s[1:]
+            else:
+                check_sort = s
+            if check_sort not in sortable:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                    detail=f"Le champ de tri {check_sort} n'existe pas")
+            if s[0] == "-":
+                sort_criteria.append(getattr(Unite, s[1:]).desc())
+                sort_url += f"-{s[1:]},"
+            else:
+                sort_criteria.append(getattr(Unite, s))
+                sort_url += f"{s},"
         if url[-1] != "?":
             url += "&"
-        url += f"sort={sort_url}"
-    else:
-        data = session.query(Unite).all()
+        url += f"sort={sort_url[:-1]}"
+        data = session.query(Unite).order_by(*sort_criteria).all()
 
     if len(data) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unite trouvée")

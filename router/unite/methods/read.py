@@ -2,6 +2,7 @@ from database import session
 from router.unite.unite import router
 from models import Unite
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=200)
 def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
@@ -27,12 +28,16 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
         else:
             sort_url += f"{sort}"
             sort = getattr(Unite, sort)
-        data = session.query(Unite).order_by(sort).all()
+        data = (session.query(Unite).order_by(sort)
+                .options(joinedload(Unite.element_chimiques), joinedload(Unite.productions), joinedload(Unite.engrais))
+                .all())
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url}"
     else:
-        data = session.query(Unite).all()
+        data = (session.query(Unite)
+                .options(joinedload(Unite.element_chimiques), joinedload(Unite.productions), joinedload(Unite.engrais))
+                .all())
 
     if len(data) == 0:
         raise HTTPException(status_code=404, detail="Aucune unite trouvée")
@@ -46,7 +51,7 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
     if url[-1] != "?":
         url += "&"
 
-    response = {"unites": [un.un for un in data[skip:skip + limit]]}
+    response = {"unites": data[skip:skip + limit]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"

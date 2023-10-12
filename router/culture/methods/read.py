@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy.orm import lazyload, joinedload
+from sqlalchemy.orm import joinedload
 
 from database import session
 from router.culture.culture import router

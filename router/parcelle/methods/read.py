@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from database import session
 from router.parcelle.parcelle import router
 from models import Parcelle
+from sqlalchemy.orm import joinedload
 
 
 @router.get("/", status_code=201)
@@ -16,7 +17,7 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
     - un message d'erreur en cas d'erreur
     - un status code correspondant
     """
-    data = session.query(Parcelle).all()
+    data = session.query(Parcelle).options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).all()
 
     url = f"http://127.0.0.1:8000/parcelle?"
 
@@ -42,7 +43,8 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = session.query(Parcelle).order_by(*sort_criteria).all()
+        data = (session.query(Parcelle).order_by(*sort_criteria)
+                .options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).all())
 
 
 
@@ -74,7 +76,7 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
     if url[-1] != "?":
         url += "&"
 
-    response = {"parcelles": [no_parcelle for no_parcelle in data[skip:skip + limit]]}
+    response = {"parcelles": data[skip:skip + limit]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -95,7 +97,8 @@ def read_parcelle(parcelle: int):
     - un status code correspondant
     """
 
-    data = session.query(Parcelle).filter(Parcelle.no_parcelle == parcelle).first()
+    data = (session.query(Parcelle).filter(Parcelle.no_parcelle == parcelle)
+            .options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).first())
 
     if not data:
         raise HTTPException(status_code=404, detail="Parcelle introuvable")

@@ -1,10 +1,10 @@
 from database import session
 from router.date.date import router
 from models import Date
+from fastapi import HTTPException
 
-
-@router.get("/")
-def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
+@router.get("/",status_code=200)
+def read_dates(skip: int = 0, limit: int = 10, sort: str = None):
     """
     Récupère les lignes de la table date
     ### Paramètres
@@ -34,10 +34,10 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
         data = session.query(Date).all()
 
     if len(data) == 0:
-        return {"message": "Aucune date trouvée", "status": 404}
+        raise HTTPException(status_code=404,detail="Aucune date trouvée")
 
     if skip >= len(data):
-        return {"message": "Skip est plus grand que le nombre de date", "status": 400}
+        raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre de date")
 
     if limit > len(data):
         limit = len(data)
@@ -45,7 +45,7 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
     if url[-1] != "?":
         url += "&"
 
-    response = {"status": 200, "dates": [date.date for date in data[skip:skip + limit]]}
+    response = {"dates": [date.date for date in data[skip:skip + limit]]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -54,8 +54,8 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
 
     return response
 
-@router.get("/{datetime}")
-def read_unite(datetime: str):
+@router.get("/{datetime}",status_code=200)
+def read_date(datetime: str):
     """
     Récupère une ligne de la table date
     ### Paramètres
@@ -69,6 +69,6 @@ def read_unite(datetime: str):
     data = session.query(Date).filter(Date.date == datetime).first()
 
     if not data:
-        return {"message": "Date introuvable", "status": 404}
+        raise HTTPException(status_code=404,detail="Date introuvable")
 
-    return {"status": 200, "date": data.date}
+    return {"date": data.date}

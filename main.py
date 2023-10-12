@@ -15,9 +15,6 @@ import os
 load_dotenv()
 app = FastAPI()
 
-app.include_router(unite_router)
-app.include_router(date_router)
-
 
 @app.middleware("http")
 async def verify_token(request: Request, call_next):
@@ -55,6 +52,7 @@ async def verify_token(request: Request, call_next):
 
 app.include_router(unite_router, prefix="/api")
 app.include_router(authentification_router, prefix="/api")
+app.include_router(date_router, prefix="/api")
 
 
 @app.get("/")

@@ -1,8 +1,8 @@
 from database import session
 from router.date.date import router
 from models import Date
-
-@router.delete("/{date}")
+from fastapi import HTTPException
+@router.delete("/{date}",status_code=200)
 def delete_date(datetime:str):
     """
         Supprime une ligne dans la table date
@@ -18,5 +18,5 @@ def delete_date(datetime:str):
         if date.date==datetime:
             session.delete(date)
             session.commit()
-            return {"message": "Date supprimée avec succès", "status": 200}
-    return {"message": "Date non trouvée", "status": 404}
+            return {"message": "Date supprimée avec succès"}
+    raise HTTPException(status_code=404,detail="Date non trouvée")

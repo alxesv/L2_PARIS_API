@@ -5,6 +5,7 @@ from models import Compteur
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 
+from router.compteur.compteur import router as compteur_router
 from router.epandre.epandre import router as epandre_router
 from router.unite.unite import router as unite_router
 from router.production.production import router as production_router
@@ -61,8 +62,19 @@ async def add_compteur(request: Request, call_next):
     request param = details on the request
     call_next     = call the function next the middleware
     """
-    print(request.headers)
-    if request.url.path.startswith("/api") and request.headers.get('referer') is None:
+    routes = [
+    "engrais",
+    "unite",
+    "element_chimique",
+    "production",
+    "epandre",
+    "compteur",
+    "culture",
+    "date",
+    "parcelle",
+    "posseder"
+    ]
+    if request.url.path.startswith("/api") and request.headers.get('referer') is None and request.url.path.split("/")[2] in routes:
         try:
             compteur = Compteur(
                 horodatage=datetime.now(),
@@ -83,6 +95,7 @@ app.include_router(engrais_router, prefix="/api")
 app.include_router(element_chimique_router, prefix="/api")
 app.include_router(authentification_router, prefix="/api")
 app.include_router(production_router, prefix="/api")
+app.include_router(compteur_router, prefix="/api")
 
 
 

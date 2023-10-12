@@ -23,7 +23,7 @@ def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
     """
     data = session.query(Epandre).all()
 
-    url = f"http://127.0.0.1:8000/api/engrais?"
+    url = f"http://127.0.0.1:8000/api/epandre?"
 
     sortable = Epandre.__table__.columns.keys()
 

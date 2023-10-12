@@ -33,6 +33,11 @@ def update_element_chimique(code_element: str, updated_element_chimique: Element
         if not any(unite.un == updated_element_chimique.un for unite in all_unites):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unité trouvée")
 
+    if updated_element_chimique.libelle_element is not None:
+        for element_chimique in all_elements:
+            if element_chimique.libelle_element == updated_element_chimique.libelle_element and element_chimique.code_element != code_element:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Élément chimique déjà existant")
+
     try:
         element_chimique = session.query(ElementChimique).filter(ElementChimique.code_element == code_element).first()
         if updated_element_chimique.un is not None:

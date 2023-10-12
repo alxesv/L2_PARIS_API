@@ -12,7 +12,6 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     - limit: nombre d'éléments à retourner
     - sort: le ou les champs sur lequel trier les résultats
     - un: le nom de l'unite à filtrer
-    - nom_engrais: le nom de l'engrais à filtrer
     ### Retour
     - un objet JSON contenant les lignes de la table Engrais, filtrées et/ou triées
     - un message d'erreur en cas d'erreur

@@ -6,18 +6,19 @@ from fastapi import status, HTTPException
 @router.delete("/{production}", status_code=status.HTTP_200_OK)
 def delete_production(production: int):
     """
-    Supprime une ligne dans la table production
+    Supprime une ligne dans la table Production
     ### Paramètres
-    - production : le code_production de la production
+    - production : le code de la production
     ### Retour
     - Status code 200 si tout s'est bien passé avec message de confirmation
     - Message d'erreur avec le status code correspondant sinon
     """
     productions = session.query(Production).all()
-    for code_production in productions:
-        if code_production.code_production == production:
-            session.delete(code_production)
+    for production_item in productions:
+        if production_item.code_production == production:
+            deleted_production_name = production_item.nom_production
+            session.delete(production_item)
             session.commit()
-            return {"message": "Production supprimée avec succès"}
+            return {"message": "Production supprimée avec succès", "delete": deleted_production_name}
 
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La production n'a pas été trouvée")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune production trouvée")

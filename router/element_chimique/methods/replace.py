@@ -32,6 +32,11 @@ def replace_element_chimique(code_element: str, new_element_chimique: ElementChi
         if not any(unite.un == new_element_chimique.un for unite in all_unites):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unité trouvée")
 
+    if new_element_chimique.libelle_element is not None:
+        for element_chimique in all_elements_chimique:
+            if element_chimique.libelle_element == new_element_chimique.libelle_element and element_chimique.code_element != code_element:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Élément chimique déjà existant")
+
     try:
         engrais = session.query(ElementChimique).filter(ElementChimique.code_element == code_element).first()
         for (key, value) in new_element_chimique:

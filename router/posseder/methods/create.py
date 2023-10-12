@@ -20,13 +20,13 @@ def create_posseder(new_posseder: PossederBase):
     - Message d'erreur avec le status code correspondant sinon
     """
 
-    code_elements = session.query(ElementChimique).all()
-    if not any(code_element.code_element == new_posseder.code_element for code_element in code_elements):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun code d'élément chimique trouvé")
-
     engrais = session.query(Engrais).all()
     if not any(engrais_item.id_engrais == new_posseder.id_engrais for engrais_item in engrais):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun engrais trouvé")
+
+    code_elements = session.query(ElementChimique).all()
+    if not any(code_element.code_element == new_posseder.code_element for code_element in code_elements):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun code d'élément chimique trouvé")
 
     posseders = session.query(Posseder).all()
     for posseder_item in posseders:

@@ -70,7 +70,7 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un:
     if url[-1] != "?":
         url += "&"
 
-    response = {"elements": [element_chimique for element_chimique in data[skip:skip + limit]] }
+    response = {"elements": [element_chimique for element_chimique in data[skip:skip + limit]]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"

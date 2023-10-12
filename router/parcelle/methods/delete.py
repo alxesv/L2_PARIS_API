@@ -18,5 +18,5 @@ def delete_parcelle(parcelle: int):
         if no_parcelle.no_parcelle == parcelle:
             session.delete(no_parcelle)
             session.commit()
-            return {"message": "Parcelle supprimée avec succès"}
+            return {"message": "Parcelle supprimée avec succès", "deleted_parcelle": parcelle}
     raise HTTPException(status_code=404,detail="Parcelle non trouvée")

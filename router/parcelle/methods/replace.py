@@ -5,9 +5,9 @@ from pydantic import BaseModel
 from fastapi import HTTPException
 
 class ParcelleBase(BaseModel):
-    surface: int=None
-    nom_parcelle: str=None
-    coordonnees: str=None
+    surface: int
+    nom_parcelle: str
+    coordonnees: str
 
 
 @router.put("/{no_parcelle}", status_code=200)

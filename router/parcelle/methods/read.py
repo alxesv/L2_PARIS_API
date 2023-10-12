@@ -5,7 +5,7 @@ from models import Parcelle
 
 
 @router.get("/", status_code=201)
-def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None):
+def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:int=None, surface:int=None, nom_parcelle:str=None, coordonnees:str=None):
     """
     Récupère les lignes de la table parcelle
     ### Paramètres
@@ -16,27 +16,54 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None):
     - un message d'erreur en cas d'erreur
     - un status code correspondant
     """
+    data = session.query(Parcelle).all()
 
     url = f"http://127.0.0.1:8000/parcelle?"
 
-    if sort and sort in ["no_parcelle", "-no_parcelle"]:
+    sortable = Parcelle.__table__.columns.keys()
+
+    if sort is not None:
+        sort_criteria = []
         sort_url = ""
-        if sort[0] == "-":
-            sort_url += f"{sort}"
-            sort = getattr(Parcelle, sort[1:]).desc()
-        else:
-            sort_url += f"{sort}"
-            sort = getattr(Parcelle, sort)
-        data = session.query(Parcelle).order_by(sort).all()
+        sort = sort.split(",")
+        for s in sort:
+            if s[0] == "-":
+                check_sort = s[1:]
+            else:
+                check_sort = s
+            if check_sort not in sortable:
+                raise HTTPException(status_code=400, detail=f"Le champ de tri {check_sort} n'existe pas")
+            if s[0] == "-":
+                sort_criteria.append(getattr(Parcelle, s[1:]).desc())
+                sort_url += f"-{s[1:]},"
+            else:
+                sort_criteria.append(getattr(Parcelle, s))
+                sort_url += f"{s},"
         if url[-1] != "?":
             url += "&"
-        url += f"sort={sort_url}"
-    else:
-        data = session.query(Parcelle).all()
+        url += f"sort={sort_url[:-1]}"
+        data = session.query(Parcelle).order_by(*sort_criteria).all()
 
-    if len(data) == 0:
-        raise HTTPException(status_code=404,detail="Aucune parcelle trouvée")
 
+
+    if surface is not None and surface > 0:
+        if not any(parcelle.surface >= surface for parcelle in data):
+            raise HTTPException(status_code=404, detail="Aucune parcelle trouvé avec surface")
+        data = [parcelle for parcelle in data if parcelle.surface >= surface]
+
+    if no_parcelle is not None:
+        if not any(parcelle.no_parcelle == no_parcelle for parcelle in data):
+            raise HTTPException(status_code=404, detail="Aucune parcelle trouvé avec no_parcelle")
+        data = [parcelle for parcelle in data if parcelle.no_parcelle == no_parcelle]
+
+    if coordonnees is not None:
+        if not any(parcelle.coordonnees == coordonnees for parcelle in data):
+            raise HTTPException(status_code=404, detail="Aucune parcelle trouvée avec coordonnees")
+        data = [parcelle for parcelle in data if parcelle.coordonnees == coordonnees]
+    if nom_parcelle is not None:
+        if not any(parcelle.nom_parcelle == nom_parcelle for parcelle in data):
+            raise HTTPException(status_code=404, detail="Aucune parcelle trouvée avec nom_parcelle")
+        data = [parcelle for parcelle in data if parcelle.nom_parcelle == nom_parcelle]
 
     if skip >= len(data):
         raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre de parcelle")

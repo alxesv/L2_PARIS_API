@@ -21,16 +21,16 @@ def replace_production(code_production: int, new_production: ProductionBase):
     all_productions = session.query(Production).all()
 
     if not any(production.code_production == code_production for production in all_productions):
-        raise HTTPException(status_code=404, detail="Production non trouvée")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Production non trouvée")
 
     if new_production.un is not None:
         all_unites = session.query(Unite).all()
         if not any(unite.un == new_production.un for unite in all_unites):
-            raise HTTPException(status_code=404, detail="Unite non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unite non trouvée")
     if new_production.nom_production is not None:
         for production in all_productions:
             if production.nom_production == new_production.nom_production and production.code_production != code_production:
-                raise HTTPException(status_code=400, detail="Production déjà existante")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Production déjà existante")
 
     try:
         production = session.query(Production).filter(Production.code_production == code_production).first()
@@ -39,4 +39,4 @@ def replace_production(code_production: int, new_production: ProductionBase):
         session.commit()
         return {"message": "Production modifiée avec succès", "production": new_production.model_dump()}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

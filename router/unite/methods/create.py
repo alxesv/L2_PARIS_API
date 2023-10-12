@@ -22,6 +22,7 @@ def create_unite(unite: UniteBase):
         if un.un == unite.un:
             raise HTTPException(status_code=400, detail="Unite déjà existante")
 
+
     try:
         unite = Unite(un=unite.un)
         session.add(unite)

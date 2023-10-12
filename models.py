@@ -16,8 +16,8 @@ class Culture(Base):
     identifiant_culture: Mapped[int] = mapped_column(primary_key=True)
     no_parcelle: Mapped[int] = mapped_column(ForeignKey("parcelle.no_parcelle"))
     code_production: Mapped[int] = mapped_column(ForeignKey("production.code_production"))
-    date_debut: Mapped[str]
-    date_fin: Mapped[str]
+    date_debut: Mapped[str] = mapped_column(String(255))
+    date_fin: Mapped[str] = mapped_column(String(255))
     qte_recoltee: Mapped[int]
     parcelle: Mapped["Parcelle"] = relationship(back_populates="cultures")
     production: Mapped["Production"] = relationship(back_populates="cultures")
@@ -61,7 +61,7 @@ class Epandre(Base):
 
 class Date(Base):
     __tablename__ = "date"
-    date: Mapped[str] = mapped_column(primary_key=True)
+    date: Mapped[str] = mapped_column(String(255), primary_key=True)
     epandres: Mapped[List["Epandre"]] = relationship(
         back_populates="date", cascade="all, delete-orphan"
     )
@@ -113,3 +113,11 @@ class Unite(Base):
     element_chimiques: Mapped[List["ElementChimique"]] = relationship(
         back_populates="unite", cascade="all, delete-orphan"
     )
+
+
+class Compteur(Base):
+    __tablename__ = "compteur"
+    id_compteur: Mapped[int] = mapped_column(primary_key=True)
+    horodatage: Mapped[str] = mapped_column(String(50))
+    route: Mapped[str] = mapped_column(String(255))
+    methode: Mapped[str] = mapped_column(String(10))

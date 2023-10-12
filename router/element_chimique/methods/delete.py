@@ -3,7 +3,6 @@ from router.element_chimique.element_chimique import router
 from models import ElementChimique
 from fastapi import HTTPException, status
 
-
 @router.delete("/{code_element}", status_code=status.HTTP_200_OK)
 def delete_element_chimique(code_element: str):
     """

@@ -36,6 +36,9 @@ def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
                 check_sort = s[1:]
             else:
                 check_sort = s
+            if check_sort == "date":
+                check_sort = "date_fk"
+                s = s.replace("date", "date_fk")
             if check_sort not in sortable:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Le champ de tri {check_sort} n'existe pas")
             if s[0] == "-":

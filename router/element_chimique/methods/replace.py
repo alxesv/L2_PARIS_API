@@ -4,7 +4,6 @@ from models import ElementChimique, Unite
 from fastapi import HTTPException, status
 from pydantic import BaseModel
 
-
 class ElementChimiqueBase(BaseModel):
     un: str
     libelle_element: str
@@ -14,7 +13,7 @@ def replace_element_chimique(code_element: str, new_element_chimique: ElementChi
     """
     Remplace une ligne dans la table Element_Chimique
     ### Paramètres
-    - code_element: Le code de l'élément chimique
+    - code_element: le code de l'élément chimique
     - new_element_chimique: objet de type ElementChimique, avec les champs un et libelle_element
     ### Retour
     - un message de confirmation ou d'erreur

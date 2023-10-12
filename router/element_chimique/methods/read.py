@@ -11,16 +11,18 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un:
     ### Paramètres
     - skip: nombre d'éléments à sauter
     - limit: nombre d'éléments à retourner
+    - sort: le ou les champs sur lequel trier les résultats
     - un : l'unité de l'élément chimique à filtrer
     - libelle_element: description de l'élément chimique à filtrer
     ### Retour
     - un objet JSON contenant les lignes de la talbe Element_Chimique
     - un message d'erreur en cas d'erreur
     - un status code correspondant
+    - url de navigation pour la pagination
     """
     data = session.query(ElementChimique).all()
 
-    url = f"http://127.0.0.1:8000/element_chimique?"
+    url = f"http://127.0.0.1:8000/api/element_chimique?"
 
     sortable = ElementChimique.__table__.columns.keys()
 
@@ -80,14 +82,14 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None, un:
 
 
 @router.get("/{code_element}", status_code=status.HTTP_200_OK)
-def read_element_chimique(code_element: str):
+def read_element_chimique_by_code_element(code_element: str):
     """
     Récupère une ligne de la table Element_Chimique
     ### Paramètres
-    - code_element: Le code de l'élément chimique
+    - code_element: le code de l'élément chimique
     ### Retour
     - un objet de type ElementChimique
-    - un message d'erreur en cas d'erreur
+    - un message de confirmation ou d'erreur
     - un status code correspondant
     """
 

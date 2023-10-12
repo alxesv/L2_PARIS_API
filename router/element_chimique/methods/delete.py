@@ -9,7 +9,7 @@ def delete_element_chimique(code_element: str):
     """
     Supprime une ligne dans la table Element_Chimique
     ### Paramètres
-    - code_element: code de l'élément chimique
+    - code_element: le code de l'élément chimique
     ### Retour
     - Status code 200 si tout s'est bien passé avec message de confirmation
     - Message d'erreur avec le status code correspondant sinon
@@ -17,8 +17,8 @@ def delete_element_chimique(code_element: str):
     element_chimiques = session.query(ElementChimique).all()
     for element_chimique in element_chimiques:
         if element_chimique.code_element == code_element:
-            deleted_engrais_name = element_chimique.code_element
+            deleted_element_chimique = element_chimique.code_element
             session.delete(element_chimique)
             session.commit()
-            return {"message": "Élément chimique supprimé avec succès", "deleted_element": deleted_engrais_name}
+            return {"message": "Élément chimique supprimé avec succès", "deleted_element_chimique": deleted_element_chimique}
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun élément chimique trouvé")

@@ -37,7 +37,7 @@ def create_posseder(posseder: PossederBase):
         add_posseder = Posseder(id_engrais=posseder.id_engrais, code_element=posseder.code_element, valeur=posseder.valeur)
         session.add(add_posseder)
         session.commit()
-        return {"message": "Posséssion créé avec succès", "posséder": posseder.model_dump()}
+        return {"message": "Possession créée avec succès", "posseder": posseder.model_dump()}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

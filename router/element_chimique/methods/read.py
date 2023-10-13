@@ -21,11 +21,6 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    if populate is not False:
-      data = session.query(ElementChimique).options(joinedload(ElementChimique.posseder), joinedload(ElementChimique.unite)).all()
-    else:
-      data = session.query(ElementChimique).all()
-
     url = f"http://127.0.0.1:8000/api/element_chimique?"
 
     sortable = ElementChimique.__table__.columns.keys()
@@ -52,9 +47,20 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None
             url += "&"
         url += f"sort={sort_url[:-1]}"
         if populate is not False:
-          data = session.query(ElementChimique).order_by(*sort_criteria).options(joinedload(ElementChimique.posseder), joinedload(ElementChimique.unite)).all()
+            data = session.query(ElementChimique).order_by(*sort_criteria).options(joinedload(ElementChimique.posseder), joinedload(ElementChimique.unite)).all()
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
           data = session.query(ElementChimique).order_by(*sort_criteria).all()
+    else:
+        if populate is not False:
+            data = session.query(ElementChimique).options(joinedload(ElementChimique.posseder), joinedload(ElementChimique.unite)).all()
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
+        else:
+          data = session.query(ElementChimique).all()
 
     if un is not None:
         if not any(element_chimique.un == un for element_chimique in data):

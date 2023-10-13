@@ -18,8 +18,6 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool 
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    data = session.query(Date).all()
-
     url = f"http://127.0.0.1:8000/api/date?"
 
     sortable = Date.__table__.columns.keys()

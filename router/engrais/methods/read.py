@@ -19,14 +19,6 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"http://127.0.0.1:8000/engrais?"
-
-    if populate is not False:
-        data = (session.query(Engrais)
-                .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
-    else:
-        data = (session.query(Engrais).all())
-
     url = f"http://127.0.0.1:8000/api/engrais?"
 
     sortable = Engrais.__table__.columns.keys()
@@ -54,8 +46,20 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
         if populate is not False:
             data = (session.query(Engrais).order_by(*sort_criteria)
                     .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = (session.query(Engrais).order_by(*sort_criteria).all())
+    else:
+        if populate is not False:
+            data = (session.query(Engrais)
+                    .options(joinedload(Engrais.epandres), joinedload(Engrais.posseder), joinedload(Engrais.unite)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
+        else:
+            data = (session.query(Engrais).all())
 
 
     if un is not None:

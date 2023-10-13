@@ -21,13 +21,6 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"http://127.0.0.1:8000/production?"
-
-    if populate is not False:
-        data = (session.query(Production).options(joinedload(Production.cultures), joinedload(Production.unite)).all())
-    else:
-        data = (session.query(Production).all())
-
     url = f"http://127.0.0.1:8000/api/production?"
 
     sortable = Production.__table__.columns.keys()
@@ -55,8 +48,20 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
         if populate is not False:
             data = (session.query(Production).order_by(*sort_criteria)
                     .options(joinedload(Production.cultures), joinedload(Production.unite)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = (session.query(Production).order_by(*sort_criteria).all())
+    else:
+        if populate is not False:
+            data = (
+                session.query(Production).options(joinedload(Production.cultures), joinedload(Production.unite)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
+        else:
+            data = (session.query(Production).all())
 
     if un is not None:
         if not any(production.un == un for production in data):

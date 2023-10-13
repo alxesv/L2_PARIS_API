@@ -43,9 +43,9 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool 
                 sort_criteria.append(getattr(Date, s))
                 sort_url += f"{s},"
         if populate is not False:
-            data = session.query(Date).order_by(sort).options(joinedload(Date.epandres)).all()
+            data = session.query(Date).order_by(*sort_criteria).options(joinedload(Date.epandres)).all()
         else:
-            data = session.query(Date).order_by(sort).all()
+            data = session.query(Date).order_by(*sort_criteria).all()
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"

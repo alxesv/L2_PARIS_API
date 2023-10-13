@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/parcelle", tags=['parcelle'])
+router = APIRouter(prefix="/parcelles", tags=['parcelle'])
 
 from .methods.create import *
 from .methods.read import *

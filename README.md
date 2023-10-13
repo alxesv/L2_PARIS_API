@@ -82,6 +82,3 @@ Dans votre terminal, rentrez la commande ```pip3 install -r "requirements.txt```
 ## Lancer le projet
 Une fois les étapes précédentes faites, dans votre terminal, rentrez la commande ```uvicorn main:app --reload```
 
-
-
-

@@ -1,23 +1,24 @@
 from database import session
 from router.unite.unite import router
 from models import Unite
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
-@router.delete("/{unite}", status_code=200)
+@router.delete("/{unite}", status_code=status.HTTP_200_OK)
 def delete_unite(unite: str):
     """
-    Supprime une ligne dans la table unite
+    Supprime une ligne dans la table Unite
     ### Paramètres
-    - unite: le nom de l'unite
+    - unite: le nom de l'unité
     ### Retour
-    - un message de confirmation ou d'erreur
-    - un status code correspondant
+    - Status code 200 si tout s'est bien passé avec message de confirmation
+    - Message d'erreur avec le status code correspondant sinon
     """
     unites = session.query(Unite).all()
     for un in unites:
         if un.un == unite:
+            deleted_un = un
             session.delete(un)
             session.commit()
-            return {"message": "Unite supprimée avec succès"}
+            return {"message": "Unité supprimée avec succès", "deleted_un": deleted_un}
 
-    raise HTTPException(status_code=404, detail="Unite non trouvée")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unité trouvée")

@@ -1,51 +1,69 @@
 from database import session
 from router.date.date import router
 from models import Date
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
 
-
-@router.get("/",status_code=200)
+@router.get("/", status_code=status.HTTP_200_OK)
 def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool = False):
     """
-    Récupère les lignes de la table date
+    Récupère les lignes de la table Date
     ### Paramètres
     - skip: nombre d'éléments à sauter
     - limit: nombre d'éléments à retourner
+    - sort: le ou les champs sur lequel trier les résultats
     ### Retour
-    - un tableau d'objets de type Date
+    - un objet JSON contenant  les lignes de la table Date, filtrées et/ou triées
     - un message d'erreur en cas d'erreur
     - un status code correspondant
+    - url de navigation pour la pagination
     """
+    url = f"http://127.0.0.1:8000/api/date?"
 
-    url = f"http://127.0.0.1:8000/date?"
+    sortable = Date.__table__.columns.keys()
 
-    if sort and sort in ["date", "-date"]:
+    if sort is not None:
+        sort_criteria = []
         sort_url = ""
-        if sort[0] == "-":
-            sort_url += f"{sort}"
-            sort = getattr(Date, sort[1:]).desc()
-        else:
-            sort_url += f"{sort}"
-            sort = getattr(Date, sort)
+        sort = sort.split(",")
+        for s in sort:
+            if s[0] == "-":
+                check_sort = s[1:]
+            else:
+                check_sort = s
+            if check_sort not in sortable:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                    detail=f"Le champ de tri {check_sort} n'existe pas")
+            if s[0] == "-":
+                sort_criteria.append(getattr(Date, s[1:]).desc())
+                sort_url += f"-{s[1:]},"
+            else:
+                sort_criteria.append(getattr(Date, s))
+                sort_url += f"{s},"
         if populate is not False:
-            data = session.query(Date).order_by(sort).options(joinedload(Date.epandres)).all()
+            data = session.query(Date).order_by(*sort_criteria).options(joinedload(Date.epandres)).all()
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
-            data = session.query(Date).order_by(sort).all()
+            data = session.query(Date).order_by(*sort_criteria).all()
         if url[-1] != "?":
             url += "&"
-        url += f"sort={sort_url}"
+        url += f"sort={sort_url[:-1]}"
     else:
         if populate is not False:
             data = session.query(Date).options(joinedload(Date.epandres)).all()
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = session.query(Date).all()
 
     if len(data) == 0:
-        raise HTTPException(status_code=404,detail="Aucune date trouvée")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune date trouvée")
 
     if skip >= len(data):
-        raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre de date")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skip est plus grand que le nombre de date")
 
     if limit > len(data):
         limit = len(data)
@@ -62,10 +80,10 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool 
 
     return response
 
-@router.get("/{datetime}",status_code=200)
-def read_date(datetime: str, populate: bool = False):
+@router.get("/{date}",status_code=status.HTTP_200_OK)
+def read_date_by_datetime(date: str, populate: bool = False):
     """
-    Récupère une ligne de la table date
+    Récupère une ligne de la table Date
     ### Paramètres
     - date: le nom de la date
     ### Retour
@@ -75,11 +93,11 @@ def read_date(datetime: str, populate: bool = False):
     """
 
     if populate is not False:
-        data = session.query(Date).filter(Date.date == datetime).options(joinedload(Date.epandres)).first()
+        data = session.query(Date).filter(Date.date == date).options(joinedload(Date.epandres)).first()
     else:
-        data = session.query(Date).filter(Date.date == datetime).first()
+        data = session.query(Date).filter(Date.date == date).first()
 
     if not data:
-        raise HTTPException(status_code=404,detail="Date introuvable")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Date introuvable")
 
     return {"date": data}

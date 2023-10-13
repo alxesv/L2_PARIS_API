@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/production", tags=['production'])
+router = APIRouter(prefix="/productions", tags=['production'])
 from .methods.create import *
 from .methods.delete import *
 from .methods.read import *

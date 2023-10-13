@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Union
 from database import session
 from models import Compteur
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 
 from router.compteur.compteur import router as compteur_router
@@ -49,16 +49,15 @@ async def verify_token(request: Request, call_next):
                 jwt.decode(request.headers.get('authorization'), os.getenv('JWT_SECRET'), algorithms=['HS256'])
             except Exception as e:
                 return_message = {
-                    "status": 403,
                     "message": "Token de connection invalide",
                     "reason": str(e)
                 }
-                return JSONResponse(status_code=403, content=return_message)
+                return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content=return_message)
         else:
             return_message = {
                 "message": "Aucun token de connexion envoyé",
             }
-            return JSONResponse(status_code=401, content=return_message)
+            return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=return_message)
         response = await call_next(request)
         return response
     else:
@@ -94,7 +93,7 @@ async def add_compteur(request: Request, call_next):
             session.commit()
 
         except Exception as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     response = await call_next(request)
     return response
 

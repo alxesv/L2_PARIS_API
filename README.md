@@ -68,8 +68,11 @@ Rajoutez dans le dossier L2_PARIS_API un fichier .env avec ces informations :
 ```
 DB_NAME="(le nom de votre base de données)"  
 DB_USER="(votre user)"  
+DB_HOST="(votre host de la base de données)"
 DB_PASSWORD="(votre mot de passe)"
 JWT_SECRET=(clé aléatoire)
+HOST=(votre host de l'api)
+PORT=(votre port de l'api)
 ```
 
 #### Étape 3 : 

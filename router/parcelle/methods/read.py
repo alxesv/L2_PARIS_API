@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from authorization import authorization_header
 from database import session
@@ -7,7 +7,7 @@ from models import Parcelle
 from sqlalchemy.orm import joinedload
 
 
-@router.get("/", status_code=201)
+@router.get("/", status_code=status.HTTP_201_CREATED)
 def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None
                    , surface:int=None, nom_parcelle:str=None, coordonnees:str=None, populate: bool = False
                    , header_authorization=authorization_header):
@@ -35,7 +35,7 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None
             else:
                 check_sort = s
             if check_sort not in sortable:
-                raise HTTPException(status_code=400, detail=f"Le champ de tri {check_sort} n'existe pas")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Le champ de tri {check_sort} n'existe pas")
             if s[0] == "-":
                 sort_criteria.append(getattr(Parcelle, s[1:]).desc())
                 sort_url += f"-{s[1:]},"
@@ -65,20 +65,20 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None
 
     if surface is not None and surface > 0:
         if not any(parcelle.surface >= surface for parcelle in data):
-            raise HTTPException(status_code=404, detail="Aucune parcelle trouvé avec surface")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune parcelle trouvée avec surface")
         data = [parcelle for parcelle in data if parcelle.surface >= surface]
 
     if coordonnees is not None:
         if not any(parcelle.coordonnees == coordonnees for parcelle in data):
-            raise HTTPException(status_code=404, detail="Aucune parcelle trouvée avec coordonnees")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune parcelle trouvée avec coordonnees")
         data = [parcelle for parcelle in data if parcelle.coordonnees == coordonnees]
     if nom_parcelle is not None:
         if not any(parcelle.nom_parcelle == nom_parcelle for parcelle in data):
-            raise HTTPException(status_code=404, detail="Aucune parcelle trouvée avec nom_parcelle")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune parcelle trouvée avec nom_parcelle")
         data = [parcelle for parcelle in data if parcelle.nom_parcelle == nom_parcelle]
 
     if skip >= len(data):
-        raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre de parcelle")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skip est plus grand que le nombre de parcelle")
 
     if limit > len(data):
         limit = len(data)
@@ -95,7 +95,7 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None
 
     return response
 
-@router.get("/{parcelle}", status_code=201)
+@router.get("/{parcelle}", status_code=status.HTTP_201_CREATED)
 def read_parcelle(parcelle: int, populate: bool = False, header_authorization=authorization_header):
     """
     Récupère une ligne de la table parcelle
@@ -114,6 +114,6 @@ def read_parcelle(parcelle: int, populate: bool = False, header_authorization=au
         data = (session.query(Parcelle).filter(Parcelle.no_parcelle == parcelle).first())
 
     if not data:
-        raise HTTPException(status_code=404, detail="Parcelle introuvable")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parcelle introuvable")
 
     return {"parcelle": data}

@@ -3,7 +3,7 @@ from database import session
 from router.parcelle.parcelle import router
 from models import Parcelle
 from pydantic import BaseModel
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 
 class ParcelleBase(BaseModel):
@@ -11,7 +11,7 @@ class ParcelleBase(BaseModel):
     surface: int
     nom_parcelle: str
     coordonnees: str
-@router.post("/",status_code=201)
+@router.post("/",status_code=status.HTTP_201_CREATED)
 def create_parcelle(parcelle: ParcelleBase, header_authorization=authorization_header):
     """
    Ajoute une ligne dans la table parcelle
@@ -25,7 +25,7 @@ def create_parcelle(parcelle: ParcelleBase, header_authorization=authorization_h
     parcelles = session.query(Parcelle).all()
     for no_parcelle in parcelles:
         if no_parcelle.no_parcelle == parcelle.no_parcelle:
-            raise HTTPException(status_code=400, detail="Parcelle déjà existant")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Parcelle déjà existant")
 
     try:
         parcelle = Parcelle(no_parcelle=parcelle.no_parcelle,surface=parcelle.surface,nom_parcelle=parcelle.nom_parcelle,coordonnees=parcelle.coordonnees)
@@ -34,4 +34,4 @@ def create_parcelle(parcelle: ParcelleBase, header_authorization=authorization_h
         return {"message": "Parcelle créée avec succès", "parcelle": parcelle.no_parcelle}
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

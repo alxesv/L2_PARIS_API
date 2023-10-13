@@ -2,7 +2,7 @@ from database import session
 from router.date.date import router
 from models import Date
 from fastapi import HTTPException
-@router.delete("/{date}",status_code=200)
+@router.delete("/{datetime}",status_code=200)
 def delete_date(datetime:str):
     """
         Supprime une ligne dans la table date

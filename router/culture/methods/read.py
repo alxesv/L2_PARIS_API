@@ -7,7 +7,7 @@ from router.culture.culture import router
 from models import Culture, Parcelle, Production
 from sqlalchemy import asc, desc
 from fastapi import HTTPException, status
-
+from main import base_url
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle: int = None
                   , code_production: int = None, date_debut: str = None
@@ -30,7 +30,7 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"http://127.0.0.1:8000/api/culture?"
+    url = f"{base_url}/api/culture?"
 
     sort_mapping = Culture.__table__.columns.keys()
 

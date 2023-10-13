@@ -5,8 +5,7 @@ from database import session
 from router.parcelle.parcelle import router
 from models import Parcelle
 from sqlalchemy.orm import joinedload
-
-
+from main import base_url
 @router.get("/", status_code=201)
 def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:int=None
                    , surface:int=None, nom_parcelle:str=None, coordonnees:str=None, populate: bool = False
@@ -21,7 +20,7 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
     - un message d'erreur en cas d'erreur
     - un status code correspondant
     """
-    url = f"http://127.0.0.1:8000/parcelle?"
+    url = f"{base_url}/parcelle?"
 
     sortable = Parcelle.__table__.columns.keys()
 

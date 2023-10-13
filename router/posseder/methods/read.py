@@ -4,7 +4,7 @@ from router.posseder.posseder import router
 from models import Posseder
 from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
-
+from main import base_url
 
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: int = None, code_element: str = None
@@ -24,7 +24,7 @@ def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"http://127.0.0.1:8000/api/posseder?"
+    url = f"{base_url}/api/posseder?"
 
     sortable = Posseder.__table__.columns.keys()
 

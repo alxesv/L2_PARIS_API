@@ -21,18 +21,18 @@ L'objectif principal de ce projet est de fournir aux Frontend d'accéder et de m
 
 ## Routes
 
-| Routes                | Methodes                      |        
-|-----------------------|-------------------------------|
-| /api/culture          | POST, DELETE, GET, PUT, PATCH |
-| /api/production       | POST, DELETE, GET, PUT, PATCH | 
-| /api/parcelle         | POST, DELETE, GET, PUT, PATCH | 
-| /api/epandre          | POST, DELETE, GET, PUT        | 
-| /api/date             | POST, DELETE, GET             | 
-| /api/engrais          | POST, DELETE, GET, PUT, PATCH | 
-| /api/posseder         | POST, DELETE, GET, PUT        | 
-| /api/element_chimique | POST, DELETE, GET, PUT, PATCH | 
-| /api/unite            | POST, DELETE, GET             | 
-| /api/compteur         | GET                           |
+| Routes                  | Methodes                      |        
+|-------------------------|-------------------------------|
+| /api/cultures           | POST, DELETE, GET, PUT, PATCH |
+| /api/productions        | POST, DELETE, GET, PUT, PATCH | 
+| /api/parcelles          | POST, DELETE, GET, PUT, PATCH | 
+| /api/epandre            | POST, DELETE, GET, PUT        | 
+| /api/dates              | POST, DELETE, GET             | 
+| /api/engrais            | POST, DELETE, GET, PUT, PATCH | 
+| /api/posseder           | POST, DELETE, GET, PUT        | 
+| /api/elements_chimiques | POST, DELETE, GET, PUT, PATCH | 
+| /api/unites             | POST, DELETE, GET             | 
+| /api/compteur           | GET                           |
 
 Pour d'autres informations, consultez le Miro
 
@@ -57,5 +57,21 @@ Pour d'autres informations, consultez le Miro
 #### Postman : https://app.getpostman.com/join-team?invite_code=7259258bca781123637e3f034810580d&target_code=cf68b552ebe9cdafdbf41a1e4d8b6076
 
 ## Lancement du projet
+
+### Étape 1 :
+Créer une base de données, avec le nom que vous voulez dans une version supérieur ou égale à postgres16.
+
+### Étape 2 :
+Rajoutez dans le dossier L2_PARIS_API un fichier .env avec ces informations :
+```
+DB_NAME="(le nom de votre base de données)"  
+DB_USER="(votre user)"  
+DB_PASSWORD="(votre mot de passe)"
+```
+
+### Étape 3 : 
+Une fois les étapes précédentes réalisée, vous pouvez récupérer la base de données en lançant le ficheir ```database.py```
+
+
 
 

@@ -2,12 +2,12 @@
 
 ## Database
 
-![Schema de la base de données](Schema_base_de_donnee_API.png) 
+![Schema de la base de données](ressources/Schema_base_de_donnee_API.png) 
 #### Schema de la base de données
 
 ---
 
-![Table compteur](Table_compteur.png)
+![Table compteur](ressources/Table_compteur.png)
 #### Table Compteur 
 
 ## Description
@@ -69,7 +69,7 @@ Rajoutez dans le dossier L2_PARIS_API un fichier .env avec ces informations :
 DB_NAME="(le nom de votre base de données)"  
 DB_USER="(votre user)"  
 DB_PASSWORD="(votre mot de passe)"
-JWT_SECRET=(votre token)
+JWT_SECRET=(clé aléatoire)
 ```
 
 #### Étape 3 : 

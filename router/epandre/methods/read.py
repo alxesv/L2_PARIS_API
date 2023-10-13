@@ -24,12 +24,6 @@ def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    if populate is not False:
-        data = (session.query(Epandre)
-                .options(joinedload(Epandre.parcelle), joinedload(Epandre.engrais), joinedload(Epandre.date)).all())
-    else:
-        data = (session.query(Epandre).all())
-
     url = f"http://127.0.0.1:8000/api/epandre?"
 
     sortable = Epandre.__table__.columns.keys()
@@ -60,8 +54,20 @@ def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
         if populate is not False:
             data = (session.query(Epandre).order_by(*sort_criteria)
                     .options(joinedload(Epandre.parcelle), joinedload(Epandre.engrais), joinedload(Epandre.date)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = (session.query(Epandre).order_by(*sort_criteria).all())
+    else:
+        if populate is not False:
+            data = (session.query(Epandre)
+                    .options(joinedload(Epandre.parcelle), joinedload(Epandre.engrais), joinedload(Epandre.date)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
+        else:
+            data = (session.query(Epandre).all())
 
     if qte_epandue is not None and qte_epandue > 0:
         if not any(epandre.qte_epandue >= qte_epandue for epandre in data):

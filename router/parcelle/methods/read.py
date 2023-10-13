@@ -18,11 +18,6 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
     - un message d'erreur en cas d'erreur
     - un status code correspondant
     """
-    if populate is not False:
-        data = session.query(Parcelle).options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).all()
-    else:
-        data = session.query(Parcelle).all()
-
     url = f"http://127.0.0.1:8000/parcelle?"
 
     sortable = Parcelle.__table__.columns.keys()
@@ -50,8 +45,19 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
         if populate is not False:
             data = (session.query(Parcelle).order_by(*sort_criteria)
                     .options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = (session.query(Parcelle).order_by(*sort_criteria).all())
+    else:
+        if populate is not False:
+            data = session.query(Parcelle).options(joinedload(Parcelle.cultures), joinedload(Parcelle.epandres)).all()
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
+        else:
+            data = session.query(Parcelle).all()
 
 
     if surface is not None and surface > 0:

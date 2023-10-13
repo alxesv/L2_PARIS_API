@@ -28,7 +28,6 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
     - un status code correspondant
     - url de navigation pour la pagination
     """
-
     url = f"http://127.0.0.1:8000/api/culture?"
 
     sort_mapping = Culture.__table__.columns.keys()
@@ -46,12 +45,18 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
         if populate is not False:
             data = (session.query(Culture).order_by(*sort_criteria)
                     .options(joinedload(Culture.parcelle), joinedload(Culture.production)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = session.query(Culture).order_by(*sort_criteria).all()
     else:
         if populate is not False:
             data = (session.query(Culture)
                     .options(joinedload(Culture.parcelle), joinedload(Culture.production)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = session.query(Culture).all()
 

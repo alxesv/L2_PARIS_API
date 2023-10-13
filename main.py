@@ -71,14 +71,14 @@ async def add_compteur(request: Request, call_next):
     """
     routes = [
     "engrais",
-    "unite",
-    "element_chimique",
-    "production",
+    "unites",
+    "elements_chimiques",
+    "productions",
     "epandre",
     "compteur",
-    "culture",
-    "date",
-    "parcelle",
+    "cultures",
+    "dates",
+    "parcelles",
     "posseder"
     ]
     if request.url.path.startswith("/api") and request.headers.get('referer') is None and request.url.path.split("/")[2] in routes:

@@ -15,9 +15,10 @@ def delete_parcelle(parcelle: int, header_authorization=authorization_header):
     - un status code correspondant
     """
     parcelles = session.query(Parcelle).all()
-    for no_parcelle in parcelles:
-        if no_parcelle.no_parcelle == parcelle:
-            session.delete(no_parcelle)
+    for parcelle_item in parcelles:
+        if parcelle_item.no_parcelle == parcelle:
+            deleted_parcelle = parcelle_item
+            session.delete(parcelle_item)
             session.commit()
             return {"message": "Parcelle supprimée avec succès", "deleted_parcelle": parcelle}
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Parcelle non trouvée")

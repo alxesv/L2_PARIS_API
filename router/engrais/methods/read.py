@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from database import base_url
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, populate: bool = False
-                 , header_authorization=authorization_header):
+                 , nom_engrais: str = None, header_authorization=authorization_header):
     """
     Récupère les lignes de la table engrais
     ### Paramètres
@@ -68,6 +68,11 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
         if not any(engrais.un == un for engrais in data):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unité trouvée")
         data = [engrais for engrais in data if engrais.un == un]
+
+    if nom_engrais is not None:
+        if not any(engrais.nom_engrais == nom_engrais for engrais in data):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun nom d'engrais trouvé")
+        data = [engrais for engrais in data if engrais.nom_engrais == nom_engrais]
 
     if len(data) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun engrais trouvé")

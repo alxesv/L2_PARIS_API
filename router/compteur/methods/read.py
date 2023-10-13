@@ -34,7 +34,7 @@ def read_compteurs(skip: int = 0, limit: int = 10, sort: str = None, methode: st
             else:
                 check_sort = s
             if check_sort not in sortable:
-                raise HTTPException(status_code=400, detail=f"Le champ de tri {check_sort} n'existe pas")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Le champ de tri {check_sort} n'existe pas")
             if s[0] == "-":
                 sort_criteria.append(getattr(Compteur, s[1:]).desc())
                 sort_url += f"-{s[1:]},"
@@ -49,19 +49,19 @@ def read_compteurs(skip: int = 0, limit: int = 10, sort: str = None, methode: st
     if methode is not None:
         methode = methode.upper()
         if not any(compteur.methode == methode for compteur in data):
-            raise HTTPException(status_code=404, detail="Methode non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune méthode trouvée")
         data = [compteur for compteur in data if compteur.methode == methode]
 
     if route is not None:
         if not any(compteur.route.split("/")[2] == route for compteur in data):
-            raise HTTPException(status_code=404, detail="Route non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune route trouvée")
         data = [compteur for compteur in data if compteur.route.split("/")[2] == route]
 
     if len(data) == 0:
-        raise HTTPException(status_code=404, detail="Aucun engrais trouvé")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun engrais trouvé")
 
     if skip >= len(data):
-        raise HTTPException(status_code=400, detail="Skip est plus grand que le nombre d'engrais")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skip est plus grand que le nombre d'engrais")
 
     if limit > len(data):
         limit = len(data)
@@ -77,10 +77,10 @@ def read_compteurs(skip: int = 0, limit: int = 10, sort: str = None, methode: st
         response["previousPage"] = f"{url}skip={str(skip - limit)}&limit={str(limit)}"
     return response
 
-@router.get("/stats", status_code=200)
+@router.get("/stats", status_code=status.HTTP_200_OK)
 def read_stats(header_authorization=authorization_header):
     """
-    Récupère les statistiques de la table compteur
+    Récupère les statistiques de la table Compteur
     ### Retour
     - un objet contenant les statistiques
     - un message d'erreur en cas d'erreur
@@ -122,7 +122,7 @@ def read_stats(header_authorization=authorization_header):
     reponse = {"methode_count": method_count, "route_count": total_route_count, "percentages": {"methodes": methods_percentages, "routes": routes_percentages}}
     return reponse
 
-@router.get("/stats/{route}", status_code=200)
+@router.get("/stats/{route}", status_code=status.HTTP_200_OK)
 def read_stats_by_route(route: str, header_authorization=authorization_header):
     """
     Récupère les statistiques de la table compteur pour une route
@@ -135,7 +135,7 @@ def read_stats_by_route(route: str, header_authorization=authorization_header):
     """
     routes = session.query(Compteur.route).filter(Compteur.route.like(f"%/api/{route}%")).distinct().all()
     if len(routes) == 0:
-        raise HTTPException(status_code=404, detail="Route non trouvée")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune route trouvée")
     route_count = {routes[i][0]: session.query(Compteur).filter(Compteur.route == routes[i][0]).count() for i in
                   range(len(routes))}
     route_count = dict(sorted(route_count.items(), key=lambda x: x[1], reverse=True))

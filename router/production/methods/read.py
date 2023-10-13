@@ -72,6 +72,11 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     if len(data) == 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Aucune production trouvée")
 
+    if nom_production is not None:
+        if not any(production.nom_production == nom_production for production in data):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun nom de production trouvé")
+        data = [production for production in data if production.nom_production == nom_production]
+
     if skip >= len(data):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Skip est plus grand que le nombre de production")
 

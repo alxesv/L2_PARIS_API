@@ -58,19 +58,29 @@ Pour d'autres informations, consultez le Miro
 
 ## Lancement du projet
 
-### Étape 1 :
+### Récupération de la base de données
+
+#### Étape 1 :
 Créer une base de données, avec le nom que vous voulez dans une version supérieur ou égale à postgres16.
 
-### Étape 2 :
+#### Étape 2 :
 Rajoutez dans le dossier L2_PARIS_API un fichier .env avec ces informations :
 ```
 DB_NAME="(le nom de votre base de données)"  
 DB_USER="(votre user)"  
 DB_PASSWORD="(votre mot de passe)"
+JWT_SECRET=(votre token)
 ```
 
-### Étape 3 : 
+#### Étape 3 : 
 Une fois les étapes précédentes réalisée, vous pouvez récupérer la base de données en lançant le ficheir ```database.py```
+
+## Récupérer les packages
+
+Dans votre terminal, rentrez la commande ```pip3 install -r "requirements.txt```
+
+## Lancer le projet
+Une fois les étapes précédentes faites, dans votre terminal, rentrez la commande ```uvicorn main:app --reload```
 
 
 

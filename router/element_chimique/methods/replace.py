@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.element_chimique.element_chimique import router
 from models import ElementChimique, Unite
@@ -9,7 +10,8 @@ class ElementChimiqueBase(BaseModel):
     libelle_element: str
 
 @router.put("/{code_element}", status_code=status.HTTP_200_OK)
-def replace_element_chimique(code_element: str, new_element_chimique: ElementChimiqueBase):
+def replace_element_chimique(code_element: str, new_element_chimique: ElementChimiqueBase
+                             , header_authorization=authorization_header):
     """
     Remplace une ligne dans la table Element_Chimique
     ### Paramètres

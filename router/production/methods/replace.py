@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.production.production import router
 from models import Production, Unite
@@ -8,7 +9,7 @@ class ProductionBase(BaseModel):
     un: str
     nom_production: str
 @router.put("/{code_production}", status_code=status.HTTP_200_OK)
-def replace_production(code_production: int, new_production: ProductionBase):
+def replace_production(code_production: int, new_production: ProductionBase, header_authorization=authorization_header):
     """
     Remplace une ligne dans la table Production
     ### Paramètres

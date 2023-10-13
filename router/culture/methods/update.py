@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from authorization import authorization_header
 from database import session
 from router.culture.culture import router
 from models import Culture, Parcelle, Production
@@ -21,7 +22,7 @@ def compare_date(date_debut, date_fin):
     return False
 
 @router.patch("/{identifiant_culture}", status_code=status.HTTP_200_OK)
-def update_culture(identifiant_culture: int, updated_culture: CultureBase):
+def update_culture(identifiant_culture: int, updated_culture: CultureBase, header_authorization=authorization_header):
     """
     Modifie une ligne dans la table Culture
     ### Paramètres

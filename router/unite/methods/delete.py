@@ -1,10 +1,11 @@
+from authorization import authorization_header
 from database import session
 from router.unite.unite import router
 from models import Unite
 from fastapi import HTTPException, status
 
 @router.delete("/{unite}", status_code=status.HTTP_200_OK)
-def delete_unite(unite: str):
+def delete_unite(unite: str, header_authorization=authorization_header):
     """
     Supprime une ligne dans la table Unite
     ### Paramètres

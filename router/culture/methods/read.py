@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy.orm import joinedload
 
+from authorization import authorization_header
 from database import session
 from router.culture.culture import router
 from models import Culture, Parcelle, Production
@@ -10,7 +11,8 @@ from fastapi import HTTPException, status
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle: int = None
                   , code_production: int = None, date_debut: str = None
-                  , date_fin: str = None, qte_recoltee: int = None, populate: bool = False):
+                  , date_fin: str = None, qte_recoltee: int = None, populate: bool = False
+                  , header_authorization=authorization_header):
     """
     Récupère les lignes de la table Culture
     ### Paramètres
@@ -135,7 +137,7 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
 
 
 @router.get("/{identifiant_culture}", status_code=status.HTTP_200_OK)
-def read_culture_by_identifiant_culture(identifiant_culture: int, populate: bool = False):
+def read_culture_by_identifiant_culture(identifiant_culture: int, populate: bool = False, header_authorization=authorization_header):
     """
     Récupère une ligne de la table Culture
     ### Paramètres

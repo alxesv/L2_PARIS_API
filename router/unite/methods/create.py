@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.unite.unite import router
 from models import Unite
@@ -7,7 +8,7 @@ from fastapi import HTTPException, status
 class UniteBase(BaseModel):
     un: str
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_unite(new_unite: UniteBase):
+def create_unite(new_unite: UniteBase, header_authorization=authorization_header):
     """
     Ajoute une ligne dans la table Unite
     ### Paramètres

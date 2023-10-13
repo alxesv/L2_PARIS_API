@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.date.date import router
 from models import Date
@@ -10,7 +11,7 @@ class DateBase(BaseModel):
     date: str
 
 @router.put("/{date}", status_code=status.HTTP_200_OK)
-def replace_date(date: str, new_date: DateBase):
+def replace_date(new_date: DateBase, header_authorization=authorization_header):
     """
     Remplace une ligne dans la table Date
     ### Paramètres

@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.unite.unite import router
 from models import Unite
@@ -8,7 +9,7 @@ class UniteBase(BaseModel):
     un: str
 
 @router.put("/{unite}", status_code=status.HTTP_200_OK)
-def replace_unite(unite: str, new_unite: UniteBase):
+def replace_unite(unite: str, new_unite: UniteBase, header_authorization=authorization_header):
     """
     Remplace une ligne dans la table Unite
     ### Paramètres

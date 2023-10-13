@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.parcelle.parcelle import router
 from models import Parcelle
@@ -11,7 +12,7 @@ class ParcelleBase(BaseModel):
     nom_parcelle: str
     coordonnees: str
 @router.post("/",status_code=201)
-def create_parcelle(parcelle: ParcelleBase):
+def create_parcelle(parcelle: ParcelleBase, header_authorization=authorization_header):
     """
    Ajoute une ligne dans la table parcelle
     ### Paramètres

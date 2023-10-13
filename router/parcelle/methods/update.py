@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.parcelle.parcelle import router
 from models import Parcelle
@@ -11,7 +12,7 @@ class ParcelleBase(BaseModel):
 
 
 @router.patch("/{no_parcelle}", status_code=200)
-def modify_parcelle(no_parcelle: int, updated_parcelle: ParcelleBase):
+def modify_parcelle(no_parcelle: int, updated_parcelle: ParcelleBase, header_authorization=authorization_header):
     """
     Modifie une ligne dans la table parcelle
     ### Paramètres

@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.epandre.epandre import router
 from models import Epandre, Date, Parcelle, Engrais
@@ -11,7 +12,7 @@ class EpandreBase(BaseModel):
     qte_epandue: int
 
 @router.put('/', status_code=status.HTTP_200_OK)
-def replace_epandre(new_epandre: EpandreBase):
+def replace_epandre(new_epandre: EpandreBase, header_authorization=authorization_header):
     """
     Remplace une ligne dans la table epandre
     ### Paramètres

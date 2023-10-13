@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.engrais.engrais import router
 from models import Engrais
@@ -5,7 +6,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, populate: bool = False):
+def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, populate: bool = False
+                 , header_authorization=authorization_header):
     """
     Récupère les lignes de la table engrais
     ### Paramètres
@@ -89,7 +91,7 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     return response
   
 @router.get("/{id_engrais}", status_code=status.HTTP_200_OK)
-def read_engrais_by_id_engrais(id_engrais: int, populate: bool = False):
+def read_engrais_by_id_engrais(id_engrais: int, populate: bool = False, header_authorization=authorization_header):
     """
     Récupère une ligne dans la table Engrais
     ### Paramètres

@@ -1,9 +1,10 @@
+from authorization import authorization_header
 from database import session
 from router.date.date import router
 from models import Date
 from fastapi import HTTPException, status
 @router.delete("/{datetime}",status_code=status.HTTP_200_OK)
-def delete_date(datetime:str):
+def delete_date(datetime:str, header_authorization=authorization_header):
     """
     Supprime une ligne dans la table Date
     ### Paramètres

@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.unite.unite import router
 from models import Unite
@@ -7,7 +8,7 @@ class UniteBase(BaseModel):
     un: str
 
 @router.patch("/{unite}")
-def update_unite(unite: str, updated_unite: UniteBase):
+def update_unite(unite: str, updated_unite: UniteBase, header_authorization=authorization_header):
     """
     Modifie une ligne dans la table Unite
     ### Paramètres

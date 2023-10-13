@@ -1,9 +1,10 @@
+from authorization import authorization_header
 from database import session
 from router.engrais.engrais import router
 from models import Engrais
 from fastapi import HTTPException, status
 @router.delete("/{id_engrais}", status_code=status.HTTP_200_OK)
-def delete_engrais(id_engrais: int):
+def delete_engrais(id_engrais: int, header_authorization=authorization_header):
     """
     Supprime une ligne dans la table Engrais
     ### Paramètres

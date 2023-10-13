@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.element_chimique.element_chimique import router
 from models import ElementChimique, Unite
@@ -10,7 +11,7 @@ class ElementChimiqueBase(BaseModel):
     libelle_element: str
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_element_chimique(new_element_chimique: ElementChimiqueBase):
+def create_element_chimique(new_element_chimique: ElementChimiqueBase, header_authorization=authorization_header):
     """
    Ajoute une ligne dans la table Element_Chimique
     ### Paramètres

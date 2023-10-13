@@ -2,10 +2,11 @@ from database import session
 from router.compteur.compteur import router
 from models import Compteur
 from fastapi import HTTPException, status
+from authorization import authorization_header
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_compteurs(skip: int = 0, limit: int = 10, sort: str = None, methode: str = None, route: str = None):
+def read_compteurs(skip: int = 0, limit: int = 10, sort: str = None, methode: str = None, route: str = None, header_authorization=authorization_header):
     """
     Récupère les lignes de la table compteur
     ### Paramètres
@@ -77,7 +78,7 @@ def read_compteurs(skip: int = 0, limit: int = 10, sort: str = None, methode: st
     return response
 
 @router.get("/stats", status_code=status.HTTP_200_OK)
-def read_stats():
+def read_stats(header_authorization=authorization_header):
     """
     Récupère les statistiques de la table Compteur
     ### Retour
@@ -122,7 +123,7 @@ def read_stats():
     return reponse
 
 @router.get("/stats/{route}", status_code=status.HTTP_200_OK)
-def read_stats_by_route(route: str):
+def read_stats_by_route(route: str, header_authorization=authorization_header):
     """
     Récupère les statistiques de la table compteur pour une route
     ### Paramètres

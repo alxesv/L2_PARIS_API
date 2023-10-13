@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.production.production import router
 from models import Production
@@ -7,7 +8,7 @@ from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str = None
-                     , nom_production: str = None, populate: bool = False):
+                     , nom_production: str = None, populate: bool = False, header_authorization=authorization_header):
     """
     Récupère les lignes de la table Production
     ### Paramètres
@@ -90,7 +91,7 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     return response
 
 @router.get("/{code_production}", status_code=status.HTTP_200_OK)
-def read_production_by_code_production(code_production: int, populate: bool = False):
+def read_production_by_code_production(code_production: int, populate: bool = False, header_authorization=authorization_header):
     """
     Récupère une ligne de la table Production
     ### Paramètres

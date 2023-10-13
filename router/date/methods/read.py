@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.date.date import router
 from models import Date
@@ -5,7 +6,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool = False):
+def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool = False
+               , header_authorization=authorization_header):
     """
     Récupère les lignes de la table Date
     ### Paramètres
@@ -81,7 +83,7 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool 
     return response
 
 @router.get("/{date}",status_code=status.HTTP_200_OK)
-def read_date_by_datetime(date: str, populate: bool = False):
+def read_date_by_datetime(date: str, populate: bool = False, header_authorization=authorization_header):
     """
     Récupère une ligne de la table Date
     ### Paramètres

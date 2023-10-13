@@ -2,9 +2,10 @@ from database import session
 from router.date.date import router
 from models import Date
 from fastapi import HTTPException, status
+from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_dates(skip: int = 0, limit: int = 10, sort: str = None):
+def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool = False):
     """
     Récupère les lignes de la table Date
     ### Paramètres
@@ -41,10 +42,18 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None):
             else:
                 sort_criteria.append(getattr(Date, s))
                 sort_url += f"{s},"
+        if populate is not False:
+            data = session.query(Date).order_by(sort).options(joinedload(Date.epandres)).all()
+        else:
+            data = session.query(Date).order_by(sort).all()
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = session.query(Date).order_by(*sort_criteria).all()
+    else:
+        if populate is not False:
+            data = session.query(Date).options(joinedload(Date.epandres)).all()
+        else:
+            data = session.query(Date).all()
 
     if len(data) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune date trouvée")
@@ -58,7 +67,7 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None):
     if url[-1] != "?":
         url += "&"
 
-    response = {"dates": [date.date for date in data[skip:skip + limit]]}
+    response = {"dates": data[skip:skip + limit]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -68,7 +77,7 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None):
     return response
 
 @router.get("/{date}",status_code=status.HTTP_200_OK)
-def read_date_by_datetime(date: str):
+def read_date_by_datetime(date: str, populate: bool = False):
     """
     Récupère une ligne de la table Date
     ### Paramètres
@@ -79,9 +88,12 @@ def read_date_by_datetime(date: str):
     - un status code correspondant
     """
 
-    data = session.query(Date).filter(Date.date == date).first()
+    if populate is not False:
+        data = session.query(Date).filter(Date.date == date).options(joinedload(Date.epandres)).first()
+    else:
+        data = session.query(Date).filter(Date.date == date).first()
 
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Date introuvable")
 
-    return {"date": data.date}
+    return {"date": data}

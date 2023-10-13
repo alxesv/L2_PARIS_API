@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy.orm import lazyload, joinedload
+from sqlalchemy.orm import joinedload
 
 from database import session
 from router.culture.culture import router
@@ -8,7 +8,9 @@ from sqlalchemy import asc, desc
 from fastapi import HTTPException, status
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle: int = None, code_production: int = None, date_debut: str = None, date_fin: str = None, qte_recoltee: int = None):
+def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle: int = None
+                  , code_production: int = None, date_debut: str = None
+                  , date_fin: str = None, qte_recoltee: int = None, populate: bool = False):
     """
     Récupère les lignes de la table Culture
     ### Paramètres
@@ -41,11 +43,17 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
             else:
                 sort_criteria.append(asc(sort_mapping[field]))
 
-        data = (session.query(Culture).order_by(*sort_criteria)
-                .options(joinedload(Culture.parcelle), joinedload(Culture.production)).all())
+        if populate is not False:
+            data = (session.query(Culture).order_by(*sort_criteria)
+                    .options(joinedload(Culture.parcelle), joinedload(Culture.production)).all())
+        else:
+            data = session.query(Culture).order_by(*sort_criteria).all()
     else:
-        data = (session.query(Culture)
-                .options(joinedload(Culture.parcelle), joinedload(Culture.production)).all())
+        if populate is not False:
+            data = (session.query(Culture)
+                    .options(joinedload(Culture.parcelle), joinedload(Culture.production)).all())
+        else:
+            data = session.query(Culture).all()
 
     if date_debut is not None:
         try:
@@ -122,7 +130,7 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
 
 
 @router.get("/{identifiant_culture}", status_code=status.HTTP_200_OK)
-def read_culture_by_identifiant_culture(identifiant_culture: int):
+def read_culture_by_identifiant_culture(identifiant_culture: int, populate: bool = False):
     """
     Récupère une ligne de la table Culture
     ### Paramètres
@@ -133,8 +141,11 @@ def read_culture_by_identifiant_culture(identifiant_culture: int):
     - un status code correspondant
     """
 
-    data = (session.query(Culture).filter(Culture.identifiant_culture == identifiant_culture)
-            .options(joinedload(Culture.parcelle), joinedload(Culture.production)).first())
+    if populate is not False:
+        data = (session.query(Culture).filter(Culture.identifiant_culture == identifiant_culture)
+                .options(joinedload(Culture.parcelle), joinedload(Culture.production)).first())
+    else:
+        data = (session.query(Culture).filter(Culture.identifiant_culture == identifiant_culture).first())
 
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Culture introuvable")

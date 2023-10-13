@@ -2,9 +2,10 @@ from database import session
 from router.unite.unite import router
 from models import Unite
 from fastapi import HTTPException, status
+from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
-def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
+def read_unites(skip: int = 0, limit: int = 10, sort: str = None, populate: bool = False):
     """
     Récupère les lignes de la table Unite
     ### Paramètres
@@ -41,10 +42,22 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
             else:
                 sort_criteria.append(getattr(Unite, s))
                 sort_url += f"{s},"
+        if populate is not False:
+            data = (session.query(Unite).order_by(*sort_criteria)
+                    .options(joinedload(Unite.element_chimiques), joinedload(Unite.productions), joinedload(Unite.engrais))
+                    .all())
+        else:
+            data = (session.query(Unite).order_by(*sort_criteria).all())
         if url[-1] != "?":
             url += "&"
         url += f"sort={sort_url[:-1]}"
-        data = session.query(Unite).order_by(*sort_criteria).all()
+    else:
+        if populate is not False:
+            data = (session.query(Unite)
+                    .options(joinedload(Unite.element_chimiques), joinedload(Unite.productions), joinedload(Unite.engrais))
+                    .all())
+        else:
+            data = (session.query(Unite).all())
 
     if len(data) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune unite trouvée")
@@ -58,7 +71,7 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
     if url[-1] != "?":
         url += "&"
 
-    response = {"unites": [un.un for un in data[skip:skip + limit]]}
+    response = {"unites": data[skip:skip + limit]}
 
     if skip + limit < len(data):
         response["nextPage"] = f"{url}skip={str(skip + limit)}&limit={str(limit)}"
@@ -68,7 +81,7 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None):
     return response
 
 @router.get("/{unite}", status_code=status.HTTP_200_OK)
-def read_unite_by_unite(unite: str):
+def read_unite_by_unite(unite: str, populate: bool = False):
     """
     Récupère une ligne de la table Unite
     ### Paramètres
@@ -79,9 +92,14 @@ def read_unite_by_unite(unite: str):
     - un status code correspondant
     """
 
-    data = session.query(Unite).filter(Unite.un == unite).first()
+    if populate is not False:
+        data = (session.query(Unite).filter(Unite.un == unite)
+                .options(joinedload(Unite.element_chimiques), joinedload(Unite.productions), joinedload(Unite.engrais))
+                .first())
+    else:
+        data = (session.query(Unite).filter(Unite.un == unite).first())
 
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unité introuvable")
 
-    return {"unite": data.un}
+    return {"unite": data}

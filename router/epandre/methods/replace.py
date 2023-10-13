@@ -42,6 +42,7 @@ def replace_epandre(new_epandre: EpandreBase):
     epandres = session.query(Epandre).all()
     for epandre in epandres:
         if epandre.id_engrais == new_epandre.id_engrais and epandre.no_parcelle == new_epandre.no_parcelle and epandre.date == date_object:
+            epandre.qte_epandue = new_epandre.qte_epandue
             new_epandre = new_epandre.model_dump()
             session.commit()
             return {"message": "Épandage remplacé avec succès", "new_epandre": new_epandre}

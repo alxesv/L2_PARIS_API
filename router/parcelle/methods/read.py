@@ -20,7 +20,7 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None
     - un message d'erreur en cas d'erreur
     - un status code correspondant
     """
-    url = f"{base_url}/parcelles?"
+    url = f"{base_url}/api/parcelles?"
 
     sortable = Parcelle.__table__.columns.keys()
 

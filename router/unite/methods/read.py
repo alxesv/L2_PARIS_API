@@ -19,7 +19,7 @@ def read_unites(skip: int = 0, limit: int = 10, sort: str = None, populate: bool
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"{base_url}/api/unite?"
+    url = f"{base_url}/api/unites?"
 
     sortable = Unite.__table__.columns.keys()
 

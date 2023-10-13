@@ -20,7 +20,7 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool 
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"{base_url}/api/date?"
+    url = f"{base_url}/api/dates?"
 
     sortable = Date.__table__.columns.keys()
 

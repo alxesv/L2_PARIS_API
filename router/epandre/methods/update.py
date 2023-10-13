@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.epandre.epandre import router
 from models import Epandre
@@ -11,7 +12,7 @@ class EpandreBase(BaseModel):
     qte_epandue: int
 
 @router.patch('/', status_code=status.HTTP_200_OK)
-def update_epandre(id_epandre: EpandreBase):
+def update_epandre(id_epandre: EpandreBase, header_authorization=authorization_header):
     """
     Modifie une ligne dans la table epandre
     ### Paramètres

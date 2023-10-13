@@ -1,10 +1,11 @@
+from authorization import authorization_header
 from database import session
 from router.epandre.epandre import router
 from models import Epandre, Date
 from fastapi import HTTPException, status
 
 @router.delete("/", status_code=status.HTTP_200_OK)
-def delete_epandre(id_engrais: int, no_parcelle: int, date: str):
+def delete_epandre(id_engrais: int, no_parcelle: int, date: str, header_authorization=authorization_header):
     """
     Supprime une ligne dans la table Epandre
     ### Paramètres

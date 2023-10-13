@@ -1,15 +1,19 @@
+from fastapi.security import APIKeyHeader
+
 from database import session
 from router.date.date import router
 from models import Date
 from pydantic import BaseModel
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Security
 from datetime import datetime as dt
+from authorization import authorization_header
 
 class DateBase(BaseModel):
     date: str
 
+
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_date(new_date: DateBase):
+def create_date(new_date: DateBase, header_authorization=authorization_header):
     """
     Ajoute une ligne dans la table Date
     ### Paramètres

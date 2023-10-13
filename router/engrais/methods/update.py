@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.engrais.engrais import router
 from models import Engrais, Unite
@@ -9,7 +10,7 @@ class EngraisBase(BaseModel):
     nom_engrais: str = None
 
 @router.patch("/{id_engrais}", status_code=status.HTTP_200_OK)
-def update_engrais(id_engrais: int, updated_engrais: EngraisBase):
+def update_engrais(id_engrais: int, updated_engrais: EngraisBase, header_authorization=authorization_header):
     """
     Modifie une ligne dans la table Engrais
     ### Paramètres

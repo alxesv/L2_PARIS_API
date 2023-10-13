@@ -1,10 +1,11 @@
+from authorization import authorization_header
 from database import session
 from router.production.production import router
 from models import Production
 from fastapi import status, HTTPException
 
 @router.delete("/{production}", status_code=status.HTTP_200_OK)
-def delete_production(production: int):
+def delete_production(production: int, header_authorization=authorization_header):
     """
     Supprime une ligne dans la table Production
     ### Paramètres

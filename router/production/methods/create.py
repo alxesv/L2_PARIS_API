@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.production.production import router
 from models import Production, Unite
@@ -10,7 +11,7 @@ class ProductionBase(BaseModel):
     nom_production: str
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_production(new_production: ProductionBase):
+def create_production(new_production: ProductionBase, header_authorization=authorization_header):
     """
     Ajoute une ligne dans la table Production
     ### Paramètres

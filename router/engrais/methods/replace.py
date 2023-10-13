@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.engrais.engrais import router
 from models import Engrais, Unite
@@ -8,7 +9,7 @@ class EngraisBase(BaseModel):
     un: str
     nom_engrais: str
 @router.put("/{id_engrais}", status_code=status.HTTP_200_OK)
-def replace_engrais(id_engrais: int, new_engrais: EngraisBase):
+def replace_engrais(id_engrais: int, new_engrais: EngraisBase, header_authorization=authorization_header):
     """
     Remplace une ligne dans la table Engrais
     ### Paramètres

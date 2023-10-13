@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from authorization import authorization_header
 from database import session
 from router.culture.culture import router
 from models import Culture, Parcelle, Production
@@ -15,7 +16,7 @@ class CultureBase(BaseModel):
 
 
 @router.put("/{identifiant_culture}", status_code=status.HTTP_200_OK)
-def replace_culture(identifiant_culture: int, new_culture: CultureBase):
+def replace_culture(identifiant_culture: int, new_culture: CultureBase, header_authorization=authorization_header):
     """
     Remplace une ligne dans la table Culture
     ### Paramètres

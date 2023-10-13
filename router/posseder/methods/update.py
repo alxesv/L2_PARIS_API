@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.posseder.posseder import router
 from models import Posseder
@@ -10,7 +11,7 @@ class PossederBase(BaseModel):
     valeur: int
 
 @router.patch('/', status_code=status.HTTP_200_OK)
-def update_posseder(id_posseder: PossederBase):
+def update_posseder(id_posseder: PossederBase, header_authorization=authorization_header):
     """
     Modifie une ligne dans la table Posseder
     ### Paramètres

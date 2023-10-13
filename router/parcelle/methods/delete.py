@@ -1,10 +1,11 @@
+from authorization import authorization_header
 from database import session
 from router.parcelle.parcelle import router
 from models import Parcelle
 from fastapi import HTTPException
 
 @router.delete("/{parcelle}",status_code=201)
-def delete_parcelle(parcelle: int):
+def delete_parcelle(parcelle: int, header_authorization=authorization_header):
     """
     Supprime une ligne dans la table parcelle
     ### Paramètres

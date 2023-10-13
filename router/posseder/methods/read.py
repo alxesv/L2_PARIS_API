@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.posseder.posseder import router
 from models import Posseder
@@ -7,7 +8,7 @@ from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: int = None, code_element: str = None
-                  , valeur: int = None, populate: bool = False):
+                  , valeur: int = None, populate: bool = False, header_authorization=authorization_header):
     """
     Récupère  les lignes de la table Posseder
     ### Paramètres

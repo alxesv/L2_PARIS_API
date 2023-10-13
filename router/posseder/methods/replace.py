@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.posseder.posseder import router
 from models import Posseder, Engrais, ElementChimique
@@ -9,7 +10,7 @@ class PossederBase(BaseModel):
     valeur: int
 
 @router.put('/', status_code=status.HTTP_201_CREATED)
-def replace_posseder(new_posseder: PossederBase):
+def replace_posseder(new_posseder: PossederBase, header_authorization=authorization_header):
     """
     Remplace une ligne dans la table Posseder
     ### Paramètres

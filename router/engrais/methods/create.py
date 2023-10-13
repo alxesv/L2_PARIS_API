@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.engrais.engrais import router
 from models import Engrais, Unite
@@ -9,7 +10,7 @@ class EngraisBase(BaseModel):
     nom_engrais: str
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_engrais(new_engrais: EngraisBase):
+def create_engrais(new_engrais: EngraisBase, header_authorization=authorization_header):
     """
     Ajoute une ligne dans la table Engrais
     ### Paramètres

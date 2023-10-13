@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from authorization import authorization_header
 from database import session
 from router.culture.culture import router
 from models import Parcelle, Production, Culture
@@ -14,7 +15,7 @@ class CultureBase(BaseModel):
     qte_recoltee: int
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_culture(new_culture: CultureBase):
+def create_culture(new_culture: CultureBase, header_authorization=authorization_header):
     """
     Ajoute une ligne dans la table Culture
     ### Paramètres

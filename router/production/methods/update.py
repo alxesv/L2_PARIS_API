@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.production.production import router
 from models import Production, Unite
@@ -8,7 +9,7 @@ class ProductionBase(BaseModel):
     un: str = None
     nom_production: str = None
 @router.patch("/{code_production}", status_code=status.HTTP_200_OK)
-def update_production(code_production: int, updated_production: ProductionBase):
+def update_production(code_production: int, updated_production: ProductionBase, header_authorization=authorization_header):
     """
     Modifie une ligne dans la table Production
     ### Paramètres

@@ -1,3 +1,4 @@
+from authorization import authorization_header
 from database import session
 from router.element_chimique.element_chimique import router
 from models import ElementChimique
@@ -6,7 +7,8 @@ from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None
-                           , un: str = None, libelle_element: str = None, populate: bool = False):
+                           , un: str = None, libelle_element: str = None, populate: bool = False
+                           , header_authorization=authorization_header):
     """
     Récupère les lignes de la table Element_Chimique
     ### Paramètres
@@ -95,7 +97,7 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None
 
 
 @router.get("/{code_element}", status_code=status.HTTP_200_OK)
-def read_element_chimique_by_code_element(code_element: str, populate: bool = False):
+def read_element_chimique_by_code_element(code_element: str, populate: bool = False, header_authorization=authorization_header):
     """
     Récupère une ligne de la table Element_Chimique
     ### Paramètres

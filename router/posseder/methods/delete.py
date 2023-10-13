@@ -1,10 +1,11 @@
+from authorization import authorization_header
 from database import session
 from router.posseder.posseder import router
 from models import Posseder
 from fastapi import HTTPException, status
 
 @router.delete("/", status_code=status.HTTP_200_OK)
-def delete_posseder(id_engrais: int, code_element: str):
+def delete_posseder(id_engrais: int, code_element: str, header_authorization=authorization_header):
     """
     Supprime une ligne dans la table Posseder
     ### Paramètres

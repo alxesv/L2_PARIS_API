@@ -1,10 +1,11 @@
+from authorization import authorization_header
 from database import session
 from router.culture.culture import router
 from models import Culture
 from fastapi import status, HTTPException
 
 @router.delete("/{identifiant_culture}", status_code=status.HTTP_200_OK)
-def delete_culture(identifiant_culture: int):
+def delete_culture(identifiant_culture: int, header_authorization=authorization_header):
     """
     Supprime une ligne dans la table Culture
     ### Paramètres

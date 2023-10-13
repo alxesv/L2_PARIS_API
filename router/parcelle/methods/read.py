@@ -1,4 +1,6 @@
 from fastapi import HTTPException
+
+from authorization import authorization_header
 from database import session
 from router.parcelle.parcelle import router
 from models import Parcelle
@@ -7,7 +9,8 @@ from sqlalchemy.orm import joinedload
 
 @router.get("/", status_code=201)
 def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:int=None
-                   , surface:int=None, nom_parcelle:str=None, coordonnees:str=None, populate: bool = False):
+                   , surface:int=None, nom_parcelle:str=None, coordonnees:str=None, populate: bool = False
+                   , header_authorization=authorization_header):
     """
     Récupère les lignes de la table parcelle
     ### Paramètres
@@ -98,7 +101,7 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
     return response
 
 @router.get("/{parcelle}", status_code=201)
-def read_parcelle(parcelle: int, populate: bool = False):
+def read_parcelle(parcelle: int, populate: bool = False, header_authorization=authorization_header):
     """
     Récupère une ligne de la table parcelle
     ### Paramètres

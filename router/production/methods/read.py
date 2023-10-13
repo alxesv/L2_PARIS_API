@@ -22,7 +22,7 @@ def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str =
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"{base_url}/api/production?"
+    url = f"{base_url}/api/productions?"
 
     sortable = Production.__table__.columns.keys()
 

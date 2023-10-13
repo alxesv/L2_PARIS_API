@@ -30,7 +30,7 @@ def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"{base_url}/api/culture?"
+    url = f"{base_url}/api/cultures?"
 
     sort_mapping = Culture.__table__.columns.keys()
 

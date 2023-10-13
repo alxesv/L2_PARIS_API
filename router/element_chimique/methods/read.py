@@ -23,7 +23,7 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"{base_url}/api/element_chimique?"
+    url = f"{base_url}/api/elements_chimiques?"
 
     sortable = ElementChimique.__table__.columns.keys()
 

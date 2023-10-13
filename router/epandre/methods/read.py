@@ -26,7 +26,7 @@ def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"{base_url}/api/epandre?"
+    url = f"{base_url}/api/epandres?"
 
     sortable = Epandre.__table__.columns.keys()
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import joinedload
 
 
 @router.get("/", status_code=201)
-def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle:int=None
+def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None
                    , surface:int=None, nom_parcelle:str=None, coordonnees:str=None, populate: bool = False
                    , header_authorization=authorization_header):
     """
@@ -67,11 +67,6 @@ def read_parcelles(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle
         if not any(parcelle.surface >= surface for parcelle in data):
             raise HTTPException(status_code=404, detail="Aucune parcelle trouvé avec surface")
         data = [parcelle for parcelle in data if parcelle.surface >= surface]
-
-    if no_parcelle is not None:
-        if not any(parcelle.no_parcelle == no_parcelle for parcelle in data):
-            raise HTTPException(status_code=404, detail="Aucune parcelle trouvé avec no_parcelle")
-        data = [parcelle for parcelle in data if parcelle.no_parcelle == no_parcelle]
 
     if coordonnees is not None:
         if not any(parcelle.coordonnees == coordonnees for parcelle in data):

@@ -12,8 +12,14 @@ load_dotenv()
 db_name = os.getenv("DB_NAME")
 db_user = os.getenv("DB_USER")
 db_password = os.getenv("DB_PASSWORD")
+db_host = os.getenv("DB_HOST")
+host = os.getenv("HOST")
+port = os.getenv("PORT")
 
-engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password}@localhost/{db_name}", echo=True)
+base_url = f"http://{host}:{port}"
+
+
+engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}/{db_name}", echo=True)
 Base.metadata.create_all(engine)
 
 connection = engine.connect()

@@ -4,7 +4,7 @@ from router.engrais.engrais import router
 from models import Engrais
 from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
-
+from database import base_url
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, populate: bool = False
                  , nom_engrais: str = None, header_authorization=authorization_header):
@@ -21,7 +21,7 @@ def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = Non
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"http://127.0.0.1:8000/api/engrais?"
+    url = f"{base_url}/api/engrais?"
 
     sortable = Engrais.__table__.columns.keys()
 

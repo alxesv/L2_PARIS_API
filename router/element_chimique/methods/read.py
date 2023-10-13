@@ -4,7 +4,7 @@ from router.element_chimique.element_chimique import router
 from models import ElementChimique
 from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
-
+from database import base_url
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None
                            , un: str = None, libelle_element: str = None, populate: bool = False
@@ -23,7 +23,7 @@ def read_element_chimiques(skip: int = 0, limit: int = 10, sort: str = None
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"http://127.0.0.1:8000/api/element_chimique?"
+    url = f"{base_url}/api/element_chimique?"
 
     sortable = ElementChimique.__table__.columns.keys()
 

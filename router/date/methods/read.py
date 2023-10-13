@@ -4,7 +4,7 @@ from router.date.date import router
 from models import Date
 from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
-
+from database import base_url
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool = False
                , header_authorization=authorization_header):
@@ -20,7 +20,7 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool 
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    url = f"http://127.0.0.1:8000/api/date?"
+    url = f"{base_url}/api/date?"
 
     sortable = Date.__table__.columns.keys()
 

@@ -16,8 +16,9 @@ def delete_culture(identifiant_culture: int):
     cultures = session.query(Culture).all()
     for culture in cultures:
         if culture.identifiant_culture == identifiant_culture:
+            deleted_culture = culture
             session.delete(culture)
             session.commit()
-            return {"message": "Culture supprimée avec succès", "deleted_culture": culture}
+            return {"message": "Culture supprimée avec succès", "deleted_culture": deleted_culture}
 
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La culture n'a pas été trouvée")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune culture trouvée")

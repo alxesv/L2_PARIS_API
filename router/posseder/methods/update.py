@@ -12,7 +12,7 @@ class PossederBase(BaseModel):
 @router.patch('/', status_code=status.HTTP_200_OK)
 def update_posseder(id_posseder: PossederBase):
     """
-    Modifie une ligne dans la table posseder
+    Modifie une ligne dans la table Posseder
     ### Paramètres
     - id_posseder: objet de type Posseder, avec les champs id_engrais, code_element et valeur
     ### Retour

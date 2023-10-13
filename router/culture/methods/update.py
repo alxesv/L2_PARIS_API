@@ -6,14 +6,12 @@ from models import Culture, Parcelle, Production
 from pydantic import BaseModel
 from fastapi import HTTPException, status
 
-
 class CultureBase(BaseModel):
     no_parcelle: int = None
     code_production: int = None
     date_debut: str = None
     date_fin: str = None
     qte_recoltee: int = None
-
 
 def compare_date(date_debut, date_fin):
     debut = datetime.strptime(date_debut, "%Y-%m-%d")
@@ -22,14 +20,13 @@ def compare_date(date_debut, date_fin):
         return True
     return False
 
-
 @router.patch("/{identifiant_culture}", status_code=status.HTTP_200_OK)
 def update_culture(identifiant_culture: int, updated_culture: CultureBase):
     """
     Modifie une ligne dans la table Culture
     ### Paramètres
     - identifiant_culture: Identifiant de la culture à modifié
-    - updated_culture: objet de type Culture, avec les champs relatifs à Culture
+    - updated_culture: objet de type Culture, avec les champs no_parcelle, code_production, date_debut, date_fin, qte_recoltee
     ### Retour
     - un message de confirmation ou d'erreur
     - un status code correspondant
@@ -41,17 +38,17 @@ def update_culture(identifiant_culture: int, updated_culture: CultureBase):
     all_culture = session.query(Culture).all()
 
     if not any(culture.identifiant_culture == identifiant_culture for culture in all_culture):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Culture non trouvée")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune culture trouvée")
 
     if updated_culture.no_parcelle is not None:
         all_parcelles = session.query(Parcelle).all()
         if not any(parcelle.no_parcelle == updated_culture.no_parcelle for parcelle in all_parcelles):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parcelle non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune parcelle trouvée")
 
     if updated_culture.code_production is not None:
         all_productions = session.query(Production).all()
         if not any(production.code_production == updated_culture.code_production for production in all_productions):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Production non trouvée")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune production trouvée")
 
     culture = session.query(Culture).filter(Culture.identifiant_culture == identifiant_culture).first()
     if updated_culture.date_debut is not None or updated_culture.date_fin is not None:
@@ -94,6 +91,6 @@ def update_culture(identifiant_culture: int, updated_culture: CultureBase):
         else:
             updated_culture.qte_recoltee = culture.qte_recoltee
         session.commit()
-        return {"message": "Culture modifiée avec succès", "production": updated_culture.model_dump()}
+        return {"message": "Culture modifiée avec succès", "updated_production": updated_culture.model_dump()}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

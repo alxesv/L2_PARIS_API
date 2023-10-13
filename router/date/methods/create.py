@@ -2,16 +2,16 @@ from database import session
 from router.date.date import router
 from models import Date
 from pydantic import BaseModel
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from datetime import datetime as dt
 
 class DateBase(BaseModel):
     date: str
 
-@router.post("/", status_code=201)
-def create_date(datetime: DateBase):
+@router.post("/", status_code=status.HTTP_201_CREATED)
+def create_date(new_date: DateBase):
     """
-   Ajoute une ligne dans la table date
+    Ajoute une ligne dans la table Date
     ### Paramètres
     - date: objet de type Date, avec le champ date
     ### Retour
@@ -20,21 +20,21 @@ def create_date(datetime: DateBase):
     """
     try:
         # Vérifiez si datetime.date est une chaîne de caractères au format YYYY-MM-DD
-        datetime_obj = dt.strptime(datetime.date, "%Y-%m-%d")
+        datetime_obj = dt.strptime(new_date.date, "%Y-%m-%d")
     except ValueError:
-        raise HTTPException(status_code=400, detail="Format de date invalide. Utilisez le format 'YYYY-MM-DD'.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Le format de la date est invalide. Utilisez le format 'YYYY-MM-DD'.")
 
     dates = session.query(Date).all()
     for date in dates:
-        if date.date == datetime.date:
-            raise HTTPException(status_code=400, detail="Date déjà existante")
+        if date.date == new_date.date:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Date déjà existante")
 
     try:
         # Ajoutez la date à la base de données
-        new_date = Date(date=datetime.date)
+        new_date = Date(date=new_date.date)
         session.add(new_date)
         session.commit()
-        return {"message": "Date créée avec succès", "date": new_date.date}
+        return {"message": "Date créée avec succès", "new_date": new_date.date}
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

@@ -23,11 +23,6 @@ def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
     - un status code correspondant
     - url de navigation pour la pagination
     """
-    if populate is not False:
-        data = session.query(Posseder).options(joinedload(Posseder.engrais), joinedload(Posseder.element_chimique)).all()
-    else:
-        data = session.query(Posseder).all()
-
     url = f"http://127.0.0.1:8000/api/posseder?"
 
     sortable = Posseder.__table__.columns.keys()
@@ -55,8 +50,20 @@ def read_posseder(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: 
         if populate is not False:
             data = (session.query(Posseder).order_by(*sort_criteria)
                     .options(joinedload(Posseder.engrais), joinedload(Posseder.element_chimique)).all())
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = (session.query(Posseder).order_by(*sort_criteria).all())
+    else:
+        if populate is not False:
+            data = session.query(Posseder).options(joinedload(Posseder.engrais),
+                                                   joinedload(Posseder.element_chimique)).all()
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
+        else:
+            data = session.query(Posseder).all()
 
     if id_engrais is not None:
         if not any(posseder.id_engrais == id_engrais for posseder in data):

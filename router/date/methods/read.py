@@ -42,6 +42,9 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool 
                 sort_url += f"{s},"
         if populate is not False:
             data = session.query(Date).order_by(*sort_criteria).options(joinedload(Date.epandres)).all()
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = session.query(Date).order_by(*sort_criteria).all()
         if url[-1] != "?":
@@ -50,6 +53,9 @@ def read_dates(skip: int = 0, limit: int = 10, sort: str = None, populate: bool 
     else:
         if populate is not False:
             data = session.query(Date).options(joinedload(Date.epandres)).all()
+            if url[-1] != "?":
+                url += "&"
+            url += f"populate=true"
         else:
             data = session.query(Date).all()
 

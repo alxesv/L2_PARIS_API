@@ -4,7 +4,7 @@ from router.production.production import router
 from models import Production
 from fastapi import status, HTTPException
 from sqlalchemy.orm import joinedload
-from main import base_url
+from database import base_url
 
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_productions(skip: int = 0, limit: int = 10, sort: str = None, un: str = None

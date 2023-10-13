@@ -4,7 +4,7 @@ from router.engrais.engrais import router
 from models import Engrais
 from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
-from main import base_url
+from database import base_url
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_engrais(skip: int = 0, limit: int = 10, sort: str = None, un: str = None, populate: bool = False
                  , header_authorization=authorization_header):

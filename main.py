@@ -30,11 +30,6 @@ import os
 
 load_dotenv()
 app = FastAPI()
-host = os.getenv("HOST")
-port = os.getenv("PORT")
-
-base_url = f"http://{host}:{port}"
-
 @app.middleware("http")
 async def verify_token(request: Request, call_next):
     """

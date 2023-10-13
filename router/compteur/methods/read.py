@@ -3,7 +3,7 @@ from router.compteur.compteur import router
 from models import Compteur
 from fastapi import HTTPException, status
 from authorization import authorization_header
-from main import base_url
+from database import base_url
 
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_compteurs(skip: int = 0, limit: int = 10, sort: str = None, methode: str = None, route: str = None, header_authorization=authorization_header):

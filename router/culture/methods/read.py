@@ -7,7 +7,7 @@ from router.culture.culture import router
 from models import Culture, Parcelle, Production
 from sqlalchemy import asc, desc
 from fastapi import HTTPException, status
-from main import base_url
+from database import base_url
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_cultures(skip: int = 0, limit: int = 10, sort: str = None, no_parcelle: int = None
                   , code_production: int = None, date_debut: str = None

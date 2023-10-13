@@ -5,7 +5,7 @@ from models import Epandre, Date
 from fastapi import HTTPException, status
 from models import Date
 from sqlalchemy.orm import joinedload
-from main import base_url
+from database import base_url
 @router.get("/", status_code=status.HTTP_200_OK)
 def read_epandres(skip: int = 0, limit: int = 10, sort: str = None, id_engrais: int = None
                   , no_parcelle: int = None, date: str = None, qte_epandue: int = None, populate: bool = False
